@@ -26,4 +26,5 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm install serve -g
 
 EXPOSE 8080
-CMD ["npm", "run", "serve"]
+ENV PORT=8080
+CMD ["serve", "-l", "$PORT", "dist"]
