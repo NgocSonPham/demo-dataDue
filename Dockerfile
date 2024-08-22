@@ -11,6 +11,7 @@ FROM base AS builder
 ARG env
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/ckeditor5 ./ckeditor5
 COPY . .
 RUN yarn build:${env}
 
