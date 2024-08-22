@@ -1,0 +1,29 @@
+* {
+    font-family: 'Inter'
+}
+
+.chakra-select {
+    padding-inline-start: 9px !important;
+    color: #000000;
+}
+
+.chakra-select>option {
+    background-color: #fff !important;
+    padding-top: 15px !important;
+}
+
+.chakra-radio__control {
+    border: 1px solid #9ca3cf !important;
+}
+
+.chakra-radio__control[data-checked] {
+    background-color: #6F59C5 !important;
+}
+
+.chakra-radio__control[data-checked]::before {
+    display: none !important;
+}
+
+.chakra-radio__label {
+    font-size: 12px !important;
+}

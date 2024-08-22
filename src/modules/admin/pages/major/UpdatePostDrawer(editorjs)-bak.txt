@@ -1,0 +1,129 @@
+"use client";
+
+import {
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  HStack,
+  Portal
+} from "@chakra-ui/react";
+import React from "react";
+import EditorJS, { OutputBlockData } from "@editorjs/editorjs";
+import { EditorTools } from "./EditorTools";
+
+export default function UpdatePostDrawer({
+  name,
+  title,
+  content,
+  onClose,
+  onSave,
+}: {
+  name: string;
+  title: string;
+  content: string;
+  onClose: () => void;
+  onSave: (name: string, value: string, editorData: OutputBlockData[]) => void;
+}) {
+  const [editingData, _setEditingData] = React.useState(content);
+
+  // const save = async () => {
+  //   onSave(name, editingData, null);
+  // };
+
+  let editor: EditorJS;
+
+  const ejInstance = React.useRef(null);
+  const DEFAULT_INITIAL_DATA =  {
+      time: new Date().getTime(),
+      blocks: [
+        {
+          type: "header",
+          data: {
+            text: "This is my awesome editor!",
+            level: 1
+          }
+        }
+      ]
+  }
+
+  const initEditor = () => {
+    const getDataEditor = () => {
+      let data = DEFAULT_INITIAL_DATA;
+      if(content) {
+        data = {
+          time: new Date().getTime(),
+          blocks: JSON.parse(content)
+        };
+        // double check, need to parse again when get from api
+        if(typeof(data.blocks) === 'string') {
+          data.blocks = JSON.parse(data.blocks)
+        }
+      }
+      return data;
+    }
+    editor = new EditorJS({
+      holder: 'editorjs',
+      onReady: () => {
+          ejInstance.current = editor;
+      },
+      autofocus: true,
+      data: getDataEditor(),
+      onChange: async () => {
+          let content = await editor.saver.save();
+          console.log(content);
+      },
+      tools: EditorTools
+    });
+  };
+
+  const onSubmit = () => {
+    editor.save().then((outputData) => {
+      onSave(name, editingData, outputData.blocks);
+      onClose();
+    }).catch((error) => {
+      console.log('Saving failed: ', error)
+    });
+  }
+
+  React.useEffect(() => {
+    if (ejInstance.current === null) {
+      initEditor();
+    }
+
+    return () => {
+      ejInstance?.current?.destroy();
+      ejInstance.current = null;
+    };
+  }, []);
+
+  return (
+    <Portal>
+      <Drawer isOpen={true} onClose={onClose} size={"full"}>
+        <DrawerContent>
+          <DrawerCloseButton
+            rounded="full"
+            border="1px"
+            borderColor="gray.100"
+            top="16px"
+            right="24px"
+          />
+          <DrawerHeader>{title}</DrawerHeader>
+          <DrawerBody>
+            <div id='editorjs' style={{height: '84vh', overflowY: 'auto'}}></div>
+            <HStack p={4} spacing={5}>
+              <Button
+                onClick={() => onSubmit()}
+                variant={"brand"}
+              >
+                {"Lưu nháp"}
+              </Button>
+            </HStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </Portal>
+  );
+}

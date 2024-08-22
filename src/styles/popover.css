@@ -1,0 +1,22 @@
+.ant-popover-inner {
+    border-radius: 24px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    width: 360px;
+}
+
+.ant-popover-title {
+    margin: 0 !important;
+    padding: 9px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    background-color: #6F59C5 !important;
+    color: white !important;
+}
+
+.ant-popover-inner-content {
+    padding: 18px 3px !important;
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Dude</title>
+</head>
+
+<body style='margin: 0;' onscroll="onscrollweb()">
+  <div id="root"></div>
+  <script>
+    if (global === undefined) {
+      var global = window;
+    }
+  </script>
+  <script>
+    function onscrollweb() {
+      const top = document.scrollingElement.scrollTop;
+      if (top > 450) {
+        const toTopButton = document.getElementById('ToTopButton');
+        if (toTopButton) toTopButton.style.bottom = '15px';
+      } else {
+        const toTopButton = document.getElementById('ToTopButton');
+        if (toTopButton) toTopButton.style.bottom = '-45px';
+      }
+    }
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
