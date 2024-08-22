@@ -20,9 +20,11 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
+RUN npm install serve -g
+
 EXPOSE 8080
-ENV PORT=8080
-CMD ["npm", "serve", "-l", "-s", "dist", "-p", "8080"]
+CMD ["npm", "run", "serve"]
