@@ -25,5 +25,5 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm install serve -g
 
-EXPOSE 3004
+EXPOSE 8080
 CMD ["npm", "run", "serve"]
