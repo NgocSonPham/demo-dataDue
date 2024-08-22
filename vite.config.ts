@@ -17,6 +17,7 @@ export default defineConfig({
     eslintPlugin()
   ],
   build: {
+    sourcemap: true,
     commonjsOptions: {
       exclude: ["ckeditor5-custom-build"]
     },
