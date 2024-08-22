@@ -11,7 +11,7 @@ FROM base AS runner
 ARG env
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY ckeditor5/* ./ckeditor5/
+COPY --from=deps /app/ckeditor5/ ./ckeditor5/
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED 1
