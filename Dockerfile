@@ -23,8 +23,6 @@ COPY --from=builder /app/public ./public
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN npm install serve -g
-
 EXPOSE 8080
 ENV PORT=8080
-CMD ["serve", "-l", "$PORT", "dist"]
+CMD ["npm", "serve", "-l", "-s", "dist", "-p", "8080"]
