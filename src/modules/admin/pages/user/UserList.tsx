@@ -19,14 +19,14 @@ import {
 } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import React from "react";
+import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
+import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
 import Pagination from "../../../../components/Pagination";
 import userService from "../../../../services/userService";
 import { PAGE_ITEMS } from "../../../../utils/constants";
-import { getErrorMessage, userFullname } from "../../../../utils/helpers";
+import { getErrorMessage, userFullnameOrUsername } from "../../../../utils/helpers";
 import UpdateRoleModal from "./UpdateRoleModal";
-import AppToast from "../../../../components/AppToast";
-import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
 
 type RowObj = {
   id: number;
@@ -237,7 +237,7 @@ export default function UserList() {
                   <Td borderColor={borderColor}>
                     <Flex align="center">
                       <Text color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
-                        {userFullname(row, true)}
+                        {userFullnameOrUsername(row, true)}
                       </Text>
                     </Flex>
                   </Td>

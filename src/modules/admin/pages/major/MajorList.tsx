@@ -1,5 +1,6 @@
-import { EditIcon, SearchIcon } from "@chakra-ui/icons";
+import { EditIcon, Icon, SearchIcon } from "@chakra-ui/icons";
 import {
+  Button,
   Flex,
   IconButton,
   Input,
@@ -21,6 +22,7 @@ import CustomCard from "../../../../components/CustomCard";
 import Pagination from "../../../../components/Pagination";
 import majorService from "../../../../services/majorService";
 import { PAGE_ITEMS } from "../../../../utils/constants";
+import { FaPlus } from "react-icons/fa6";
 
 type RowObj = {
   id: number;
@@ -110,6 +112,9 @@ export default function MajorList() {
             onChange={(e: any) => handleSearch(e.target.value)}
           />
         </InputGroup>
+        <Button variant="action" onClick={() => navigate("/admin/majors/new")}>
+          <Icon as={FaPlus} w="15px" h="15px" />
+        </Button>
       </Flex>
 
       <Table variant="simple" color="gray.500" w="full" layout="fixed">
@@ -121,7 +126,7 @@ export default function MajorList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              w="140px"
+              w="80px"
               px="10px"
             >
               ID
@@ -137,16 +142,6 @@ export default function MajorList() {
               px="10px"
             >
               Tên
-            </Th>
-            <Th
-              textAlign="center"
-              borderColor={borderColor}
-              color="gray.400"
-              cursor="pointer"
-              fontSize={{ sm: "10px", lg: "12px" }}
-              px="10px"
-            >
-              Nhóm ngành
             </Th>
             <Th
               textAlign="center"
@@ -179,20 +174,13 @@ export default function MajorList() {
               return (
                 <Tr key={row.id}>
                   <Td borderColor={borderColor}>
-                    <Flex align="center">
-                      <Text color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
-                        {row.id}
-                      </Text>
-                    </Flex>
+                    <Text w="full" color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
+                      {row.id}
+                    </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
                     <Text color={textColor} fontSize="sm" noOfLines={1}>
                       {row.name}
-                    </Text>
-                  </Td>
-                  <Td borderColor={borderColor} px="10px">
-                    <Text color={textColor} fontSize="sm">
-                      {row.groupMajor?.name}
                     </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
@@ -226,7 +214,7 @@ export default function MajorList() {
         </Tbody>
         <Tfoot>
           <Tr>
-            <Td colSpan={6} pb={0} border={0}>
+            <Td colSpan={5} pb={0} border={0}>
               <Flex w="full" align={"center"} justify={"space-between"}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0

@@ -16,7 +16,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import CustomCard from "../../../../components/CustomCard";
 import CustomInput from "../../../../components/CustomInput";
 import CustomSelect from "../../../../components/CustomSelect";
-import CustomUploadButton from "../../../../components/CustomUploadButton";
 import provinceService from "../../../../services/provinceService";
 import trainingOrganizationService from "../../../../services/trainingOrganizationService";
 import { TRAINING_MODEL, TRAINING_TYPE } from "../../../../utils/constants";
@@ -29,7 +28,7 @@ type FormType = {
   thumbnail: string;
   code: string;
   website: string;
-  city: string;
+  provinceId: string;
   type: string;
   model: string;
 };
@@ -47,7 +46,7 @@ export default function TrainingOrganizationDetail() {
     thumbnail: "",
     code: "",
     website: "",
-    city: "",
+    provinceId: "",
     type: "",
     model: ""
   });
@@ -68,7 +67,7 @@ export default function TrainingOrganizationDetail() {
       );
 
       if (id === "new") {
-        navigate(-1);
+        setLoading(false);
         return;
       }
 
@@ -80,7 +79,7 @@ export default function TrainingOrganizationDetail() {
       reset(post, { keepDefaultValues: true });
       setLoading(false);
     } catch (error) {
-      console.log("error", error);
+      console.log("training loading error", error);
       setLoading(false);
     }
   };
@@ -91,7 +90,7 @@ export default function TrainingOrganizationDetail() {
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: any) => {
-      return trainingOrganizationService.update(id, data);
+      return id === "new" ? trainingOrganizationService.create(data) : trainingOrganizationService.update(id, data);
     },
     onSuccess: () => {
       toast({
@@ -119,13 +118,6 @@ export default function TrainingOrganizationDetail() {
     mutate(data);
   };
 
-  const handleUpload = async (name: string, file: string | string[]) => {
-    if (name === "thumbnail") {
-      setValue("thumbnail", typeof file === "object" ? file[0] : (file as string));
-      return;
-    }
-  };
-
   if (loading) {
     init();
     return (
@@ -138,26 +130,14 @@ export default function TrainingOrganizationDetail() {
   }
 
   return (
-    <CustomCard flexDirection="column" w="100%" px="10px" overflowX={{ sm: "scroll", lg: "hidden" }}>
+    <CustomCard flexDirection="column" w="100%" minH="83vh" px="10px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Stack w="full" direction={{ base: "column", xl: "row" }} spacing={0} align="flex-start">
         <VStack w={{ base: " full", md: "full", lg: "60%", xl: "50%" }} px={3} spacing={"12px"} align="flex-start">
-          <CustomUploadButton
-            bg={"secondaryGray.300"}
-            h="100px"
-            label="Add Thumbnail"
-            onUploadChange={handleUpload}
-            name={`thumbnail`}
-            src={watch("thumbnail") ?? ""}
-            thumbnail
-            rounded="8px"
-            w="120px"
-            minW="120px"
-          />
           <Controller
             name="nameVi"
             control={control}
-            render={({ field: { onChange: _, value }, fieldState: { error } }) => (
-              <CustomInput label="Tên" isReadOnly={true} value={value} error={error} onTextChange={(_value) => {}} />
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <CustomInput label="Tên" value={value} error={error} onTextChange={(value) => onChange(value)} />
             )}
           />
           <Controller
@@ -176,7 +156,7 @@ export default function TrainingOrganizationDetail() {
           />
           <Controller
             control={control}
-            name="city"
+            name="provinceId"
             rules={{ required: "Tỉnh thành không được để trống" }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <FormControl isInvalid={!!error}>

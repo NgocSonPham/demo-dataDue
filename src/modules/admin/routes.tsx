@@ -20,15 +20,15 @@ const routes: RoutesType[] = [
     level: 0,
     sidebar: true
   },
-  {
-    name: "Danh sách Tỉnh thành",
-    path: "/provinces",
-    resource: "provinces",
-    icon: <Icon as={BsFillPinMapFill} width="20px" height="20px" color="inherit" />,
-    component: <ProvinceList />,
-    level: 0,
-    sidebar: true
-  },
+  // {
+  //   name: "Danh sách Tỉnh thành",
+  //   path: "/provinces",
+  //   resource: "provinces",
+  //   icon: <Icon as={BsFillPinMapFill} width="20px" height="20px" color="inherit" />,
+  //   component: <ProvinceList />,
+  //   level: 0,
+  //   sidebar: true
+  // },
   {
     name: "Danh sách Cơ sở đào tạo",
     path: "/training-organizations",

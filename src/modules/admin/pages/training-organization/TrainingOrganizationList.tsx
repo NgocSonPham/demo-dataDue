@@ -1,5 +1,6 @@
-import { EditIcon, SearchIcon } from "@chakra-ui/icons";
+import { EditIcon, Icon, SearchIcon } from "@chakra-ui/icons";
 import {
+  Button,
   Flex,
   IconButton,
   Input,
@@ -22,14 +23,14 @@ import CustomCard from "../../../../components/CustomCard";
 import Pagination from "../../../../components/Pagination";
 import trainingOrganizationService from "../../../../services/trainingOrganizationService";
 import { PAGE_ITEMS, TRAINING_MODEL, TRAINING_TYPE } from "../../../../utils/constants";
+import { FaPlus } from "react-icons/fa6";
 
 type RowObj = {
   id: number;
   nameVi: string;
-  thumbnail: string;
   code: string;
   website: string;
-  city: string;
+  provinceId: string;
   type: string;
   model: string;
   createdAt: Date;
@@ -116,6 +117,9 @@ export default function TrainingOrganizationList() {
             onChange={(e: any) => handleSearch(e.target.value)}
           />
         </InputGroup>
+        <Button variant="action" onClick={() => navigate("/admin/training-organizations/new")}>
+          <Icon as={FaPlus} w="15px" h="15px" />
+        </Button>
       </Flex>
 
       <Table variant="simple" color="gray.500" w="full" layout="fixed">
@@ -127,7 +131,7 @@ export default function TrainingOrganizationList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              w="60px"
+              w="20%"
               px="10px"
             >
               Code
@@ -142,17 +146,6 @@ export default function TrainingOrganizationList() {
               px="10px"
             >
               Tên
-            </Th>
-            <Th
-              textAlign="center"
-              borderColor={borderColor}
-              color="gray.400"
-              cursor="pointer"
-              fontSize={{ sm: "10px", lg: "12px" }}
-              w="20%"
-              px="10px"
-            >
-              Website
             </Th>
             <Th
               textAlign="center"
@@ -219,13 +212,8 @@ export default function TrainingOrganizationList() {
                     </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
-                    <Text color={textColor} fontSize="sm" noOfLines={1}>
-                      {row.website}
-                    </Text>
-                  </Td>
-                  <Td borderColor={borderColor} px="10px">
                     <Text color={textColor} fontSize="sm" textAlign={"center"} noOfLines={1}>
-                      {row.city}
+                      {row.provinceId}
                     </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
@@ -260,7 +248,7 @@ export default function TrainingOrganizationList() {
         </Tbody>
         <Tfoot>
           <Tr>
-            <Td colSpan={8} pb={0} border={0}>
+            <Td colSpan={7} pb={0} border={0}>
               <Flex w="full" align={"center"} justify={"space-between"}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0
