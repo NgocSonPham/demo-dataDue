@@ -1,14 +1,17 @@
 import { Icon } from "@chakra-ui/react";
+import { BsBuildingsFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
-import { MdBarChart, MdList } from "react-icons/md";
-import { RiFlowChart } from "react-icons/ri";
+import { FaList } from "react-icons/fa6";
+import { MdBarChart, MdOutlineSubject } from "react-icons/md";
+import MainCategoryDetail from "./pages/main-category/MainCategoryDetail";
+import MainCategoryList from "./pages/main-category/MainCategoryList";
 import MajorDetail from "./pages/major/MajorDetail";
 import MajorList from "./pages/major/MajorList";
-import UserList from "./pages/user/UserList";
-import ProvinceList from "./pages/province/ProvinceList";
-import { BsBuildingsFill, BsFillPinMapFill } from "react-icons/bs";
-import TrainingOrganizationList from "./pages/training-organization/TrainingOrganizationList";
+import SubCategoryDetail from "./pages/sub-category/SubCategoryDetail";
+import SubCategoryList from "./pages/sub-category/SubCategoryList";
 import TrainingOrganizationDetail from "./pages/training-organization/TrainingOrganizationDetail";
+import TrainingOrganizationList from "./pages/training-organization/TrainingOrganizationList";
+import UserList from "./pages/user/UserList";
 
 const routes: RoutesType[] = [
   {
@@ -19,6 +22,15 @@ const routes: RoutesType[] = [
     component: <MajorList />,
     level: 0,
     sidebar: true
+  },
+  {
+    name: "Cập nhật Chuyên ngành",
+    path: "/majors/:id",
+    regex: /^\/admin\/majors\/[A-Z0-9]+$/,
+    resource: "majors",
+    component: <MajorDetail />,
+    level: 0,
+    sidebar: false
   },
   // {
   //   name: "Danh sách Tỉnh thành",
@@ -39,20 +51,45 @@ const routes: RoutesType[] = [
     sidebar: true
   },
   {
-    name: "Cập nhật Chuyên ngành",
-    path: "/majors/:id",
-    regex: /^\/admin\/majors\/[A-Z0-9]+$/,
-    resource: "majors",
-    component: <MajorDetail />,
-    level: 0,
-    sidebar: false
-  },
-  {
     name: "Cập nhật Cơ sở đào tạo",
     path: "/training-organizations/:id",
     regex: /^\/admin\/training-organizations\/[A-Z0-9]+$/,
     resource: "training-organizations",
     component: <TrainingOrganizationDetail />,
+    level: 0,
+    sidebar: false
+  },
+  {
+    name: "Danh sách Main category",
+    path: "/main-categories",
+    resource: "main-categories",
+    icon: <Icon as={FaList} width="20px" height="20px" color="inherit" />,
+    component: <MainCategoryList />,
+    level: 0,
+    sidebar: true
+  },
+  {
+    name: "Cập nhật Main category",
+    path: "/main-categories/:id",
+    resource: "main-categories",
+    component: <MainCategoryDetail />,
+    level: 0,
+    sidebar: false
+  },
+  {
+    name: "Danh sách Sub category",
+    path: "/sub-categories",
+    resource: "sub-categories",
+    icon: <Icon as={MdOutlineSubject} width="20px" height="20px" color="inherit" />,
+    component: <SubCategoryList />,
+    level: 0,
+    sidebar: true
+  },
+  {
+    name: "Cập nhật Sub category",
+    path: "/sub-categories/:id",
+    resource: "sub-categories",
+    component: <SubCategoryDetail />,
     level: 0,
     sidebar: false
   },

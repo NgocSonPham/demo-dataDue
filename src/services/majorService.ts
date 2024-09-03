@@ -18,7 +18,10 @@ const majorService = {
   },
   update: function (id: number | string, data: any) {
     return dataServiceAxios.patch(`core/majors/${id}`, data);
-  }
+  },
+  delete: function (id: number) {
+    return dataServiceAxios.delete(`core/majors/${id}`);
+  },
 };
 
 export default majorService;

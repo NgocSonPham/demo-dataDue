@@ -28,7 +28,7 @@ const ReloadState = () => {
     if (!isEmpty(user?.id?.toString())) {
       initUser();
     }
-    initConfig();
+    // initConfig();
   }, []);
 
   return <></>;

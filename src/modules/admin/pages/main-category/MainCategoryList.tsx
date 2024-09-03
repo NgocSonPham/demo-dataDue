@@ -19,24 +19,25 @@ import {
   useToast
 } from "@chakra-ui/react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import CustomCard from "../../../../components/CustomCard";
-import Pagination from "../../../../components/Pagination";
-import majorService from "../../../../services/majorService";
-import { PAGE_ITEMS } from "../../../../utils/constants";
 import { FaPlus } from "react-icons/fa6";
-import { getErrorMessage } from "../../../../utils/helpers";
+import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
+import CustomCard from "../../../../components/CustomCard";
 import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
+import Pagination from "../../../../components/Pagination";
+import mainCategoryService from "../../../../services/mainCategoryService";
+import { PAGE_ITEMS } from "../../../../utils/constants";
+import { getErrorMessage } from "../../../../utils/helpers";
 
 type RowObj = {
   id: number;
   name: string;
+  idx?: number;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export default function MajorList() {
+export default function MainCategoryList() {
   const navigate = useNavigate();
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
@@ -54,7 +55,7 @@ export default function MajorList() {
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
   const init = async () => {
-    const { data: { data: list } = { data: {} } } = await majorService.getAll({
+    const { data: { data: list } = { data: {} } } = await mainCategoryService.getAll({
       search,
       page,
       pageSize: itemsPerPage
@@ -79,7 +80,7 @@ export default function MajorList() {
   }, [initialized, search]);
 
   const handleEdit = (id: number) => {
-    navigate(`/admin/majors/${id}`);
+    navigate(`/admin/main-categories/${id}`);
   };
 
   const handleSearch = (value: string) => {
@@ -94,7 +95,7 @@ export default function MajorList() {
 
   const confirmDelete = async (id: number) => {
     try {
-      const { data: { data: _updated } = { data: {} } } = await majorService.delete(id);
+      const { data: { data: _updated } = { data: {} } } = await mainCategoryService.delete(id);
 
       init();
     } catch (error) {
@@ -140,7 +141,7 @@ export default function MajorList() {
             onChange={(e: any) => handleSearch(e.target.value)}
           />
         </InputGroup>
-        <Button variant="action" onClick={() => navigate("/admin/majors/new")}>
+        <Button variant="action" onClick={() => navigate("/admin/main-categories/new")}>
           <Icon as={FaPlus} w="15px" h="15px" />
         </Button>
       </Flex>
@@ -170,6 +171,17 @@ export default function MajorList() {
               px="10px"
             >
               Tên
+            </Th>
+            <Th
+              textAlign="center"
+              borderColor={borderColor}
+              color="gray.400"
+              cursor="pointer"
+              fontSize={{ sm: "10px", lg: "12px" }}
+              w="80px"
+              px="10px"
+            >
+              Thứ tự
             </Th>
             <Th
               textAlign="center"
@@ -211,6 +223,11 @@ export default function MajorList() {
                       {row.name}
                     </Text>
                   </Td>
+                  <Td borderColor={borderColor}>
+                    <Text w="full" color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
+                      {row.idx}
+                    </Text>
+                  </Td>
                   <Td borderColor={borderColor} px="10px">
                     <Flex align="center">
                       <Text color={textColor} fontSize="sm">
@@ -235,12 +252,12 @@ export default function MajorList() {
                         onClick={() => handleEdit(row.id)}
                       />
                       <DeleteIcon
-                          color="red.500"
-                          w="15px"
-                          h="15px"
-                          cursor={"pointer"}
-                          onClick={() => handleDelete(row)}
-                        />
+                        color="red.500"
+                        w="15px"
+                        h="15px"
+                        cursor={"pointer"}
+                        onClick={() => handleDelete(row)}
+                      />
                     </Flex>
                   </Td>
                 </Tr>
@@ -267,7 +284,7 @@ export default function MajorList() {
       {isOpenDelete && deletingObj && (
         <CustomConfirmAlert
           title={`Remove ${deletingObj.name}`}
-          question={"Are you sure to remove this Major?"}
+          question={"Are you sure to remove this Main Category?"}
           cancelText={"Cancel"}
           confirmText={"Confirm"}
           onClose={onCloseDelete}

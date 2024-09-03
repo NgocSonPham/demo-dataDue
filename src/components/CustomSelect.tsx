@@ -7,7 +7,7 @@ import {
   TagCloseButton,
   TagLabel,
   useColorModeValue,
-  useDisclosure,
+  useDisclosure
 } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import React from "react";
@@ -46,8 +46,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const [inputValue, setInputValue] = React.useState<string>("");
   const [listOptions, setListOptions] = React.useState<Array<Option>>(options);
   const [selectedOptions, setSelectedOptions] = React.useState<any[]>([]);
-  const [filteredOptions, setFilteredOptions] =
-    React.useState<Array<Option>>(options);
+  const [filteredOptions, setFilteredOptions] = React.useState<Array<Option>>(options);
   const { isOpen, onClose, onToggle } = useDisclosure();
   const ref = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -81,22 +80,18 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       const rect = inputRef.current.getBoundingClientRect();
       setPosition({
         top: rect.bottom,
-        left: rect.left,
+        left: rect.left
       });
     }
   }, [isOpen]);
 
   React.useEffect(() => {
     setListOptions((prev) => {
-      const uniqueOptions = options.filter(
-        (option) => !prev.some((item) => item.value === option.value)
-      );
+      const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
       return [...prev, ...uniqueOptions];
     });
     setFilteredOptions((prev) => {
-      const uniqueOptions = options.filter(
-        (option) => !prev.some((item) => item.value === option.value)
-      );
+      const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
       return [...prev, ...uniqueOptions];
     });
   }, [options]);
@@ -118,8 +113,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       if (
         ref.current &&
         !ref.current.contains(event.target as Node) &&
-        (!listRef.current ||
-          (listRef.current && !listRef.current.contains(event.target as Node)))
+        (!listRef.current || (listRef.current && !listRef.current.contains(event.target as Node)))
       ) {
         onClose();
       }
@@ -136,9 +130,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setFilteredOptions(
       newValue === ""
         ? listOptions
-        : listOptions.filter((option) =>
-            option.label.toLowerCase().includes(newValue.toLowerCase())
-          )
+        : listOptions.filter((option) => option.label.toLowerCase().includes(newValue.toLowerCase()))
     );
   };
 
@@ -167,15 +159,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const handleAddOption = () => {
     if (
       inputValue &&
-      !listOptions.find(
-        (option) =>
-          option.label.includes(inputValue) || option.value.includes(inputValue)
-      )
+      !listOptions.find((option) => option.label.includes(inputValue) || option.value.includes(inputValue))
     ) {
-      const newOptions = [
-        ...listOptions,
-        { label: inputValue, value: inputValue },
-      ];
+      const newOptions = [...listOptions, { label: inputValue, value: inputValue }];
       handleSelectOption(inputValue);
       setListOptions(newOptions);
       setFilteredOptions(newOptions);
@@ -218,23 +204,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           listOptions
             .filter((item) => item.value == value)
             .map((option) => (
-              <Tag
-                variant={"lightBrand"}
-                className={`select-tag-${name}`}
-                size="md"
-                key={index}
-                borderRadius="full"
-              >
+              <Tag variant={"lightBrand"} className={`select-tag-${name}`} size="md" key={index} borderRadius="full">
                 <TagLabel>{option.label}</TagLabel>
-                <TagCloseButton
-                  onClick={() => handleRemoveOption(option.value, index)}
-                />
+                <TagCloseButton onClick={() => handleRemoveOption(option.value, index)} />
               </Tag>
             ))
         )}
-        {(multiple ||
-          (!multiple && isEmpty(selectedOptions)) ||
-          allowAddNew) && (
+        {(multiple || (!multiple && isEmpty(selectedOptions)) || allowAddNew) && (
           <Input
             ref={searchRef}
             variant={"search"}
@@ -243,10 +219,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             onFocus={(e) => e.stopPropagation()}
             placeholder={placeholder ?? "Search.."}
             readOnly={disabled}
-            bg={useColorModeValue(
-              "transparent",
-              disabled ? "navy.700" : "navy.800"
-            )}
+            bg={useColorModeValue("transparent", disabled ? "navy.700" : "navy.800")}
             fontSize={"sm"}
             h="20px"
             w={`${searchWidth}px`}
@@ -278,7 +251,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               color={useColorModeValue("secondaryGray.900", "white")}
               _hover={{
                 bg: useColorModeValue("brand.500", "brand.400"),
-                color: "white",
+                color: "white"
               }}
               onClick={() => handleSelectOption(option.value)}
             >
@@ -287,11 +260,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           ))}
           {allowAddNew &&
             inputValue &&
-            !listOptions.find(
-              (option) =>
-                option.label.includes(inputValue) ||
-                option.value.includes(inputValue)
-            ) && (
+            !listOptions.find((option) => option.label.includes(inputValue) || option.value.includes(inputValue)) && (
               <Box
                 cursor="pointer"
                 py={2}
@@ -299,11 +268,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 color={useColorModeValue("secondaryGray.900", "white")}
                 _hover={{
                   bg: useColorModeValue("brand.500", "brand.400"),
-                  color: "white",
+                  color: "white"
                 }}
                 onClick={handleAddOption}
               >
-                Add "{inputValue}"
+                {`Add ${inputValue}`}
               </Box>
             )}
         </Box>

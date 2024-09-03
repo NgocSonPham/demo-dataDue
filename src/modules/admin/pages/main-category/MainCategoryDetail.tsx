@@ -6,15 +6,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
 import CustomInput from "../../../../components/CustomInput";
-import majorService from "../../../../services/majorService";
+import mainCategoryService from "../../../../services/mainCategoryService";
 import { getErrorMessage } from "../../../../utils/helpers";
+import { CustomInputNumber } from "../../../../components/CustomNumberInput";
 
 type FormType = {
   id?: string;
   name: string;
+  idx?: number;
 };
 
-export default function MajorDetail() {
+export default function MainCategoryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -36,7 +38,7 @@ export default function MajorDetail() {
 
       const {
         data: { data: post }
-      } = await majorService.getById(id);
+      } = await mainCategoryService.getById(id);
 
       setDefaultValues(post);
       reset(post, { keepDefaultValues: true });
@@ -52,7 +54,7 @@ export default function MajorDetail() {
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: any) => {
-      return id === "new" ? majorService.create(data) : majorService.update(id, data);
+      return id === "new" ? mainCategoryService.create(data) : mainCategoryService.update(id, data);
     },
     onSuccess: () => {
       toast({
@@ -64,7 +66,7 @@ export default function MajorDetail() {
       });
 
       reset(defaultValues, { keepDefaultValues: true });
-      navigate("/admin/majors");
+      navigate("/admin/main-categories");
     },
     onError: (error) => {
       const message = getErrorMessage(error);
@@ -98,12 +100,27 @@ export default function MajorDetail() {
           <Controller
             name="name"
             control={control}
+            rules={{ required: "Tên không được để trống" }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CustomInput
-                label="Tên chuyên ngành"
+                label="Tên main category"
                 value={value}
                 error={error}
                 onTextChange={(value) => onChange(value)}
+              />
+            )}
+          />
+          <Controller
+            name="idx"
+            control={control}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <CustomInputNumber
+                label="Thứ tự"
+                value={value}
+                onChange={(e: any) => {
+                  const value = e?.target.value ?? 0;
+                  onChange(value);
+                }}
               />
             )}
           />
@@ -111,7 +128,7 @@ export default function MajorDetail() {
       </Stack>
       <HStack p={4} spacing={5}>
         <Button isLoading={isLoading} onClick={onSubmit(handleSubmit)} variant={"brand"}>
-          {"Lưu chuyên ngành"}
+          {"Lưu"}
         </Button>
       </HStack>
     </CustomCard>
