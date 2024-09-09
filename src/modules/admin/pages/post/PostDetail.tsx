@@ -23,6 +23,7 @@ import postService from "../../../../services/postService";
 import mainCategoryService from "../../../../services/mainCategoryService";
 import subCategoryService from "../../../../services/subCategoryService";
 import C4UCKeditor from "./C4UCKeditor";
+import { isEmpty } from "lodash";
 
 type FormType = {
   id?: string;
@@ -108,6 +109,7 @@ export default function PostDetail() {
   const mainCategoryId = watch("mainCategoryId");
   React.useEffect(() => {
     if (!mainCategoryId) return;
+
     initSubCategories(mainCategoryId);
   }, [mainCategoryId]);
 
@@ -142,7 +144,6 @@ export default function PostDetail() {
   };
 
   const handleUpload = async (name: string, file: string | string[]) => {
-    console.log("name", name, file);
     if (name === "thumbnail") {
       setValue("thumbnail", typeof file === "object" ? file[0] : (file as string));
       return;
@@ -159,7 +160,7 @@ export default function PostDetail() {
       </CustomCard>
     );
   }
-
+  
   return (
     <CustomCard flexDirection="column" w="100%" minH="83vh" px="10px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Stack w="full" direction={{ base: "column", xl: "row" }} spacing={0} align="flex-start">
@@ -247,7 +248,14 @@ export default function PostDetail() {
                   multiple
                   name={"topics"}
                   value={value}
-                  options={topicList}
+                  options={
+                    isEmpty(topicList)
+                      ? value.map((item: string) => ({
+                          label: item,
+                          value: item
+                        }))
+                      : topicList
+                  }
                   onSelected={onChange}
                 />
 

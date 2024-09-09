@@ -15,8 +15,6 @@ import {
   useDisclosure,
   useToast
 } from "@chakra-ui/react";
-import { AdvancedImage, lazyload, responsive } from "@cloudinary/react";
-import { Cloudinary } from "@cloudinary/url-gen";
 import React, { useMemo } from "react";
 import { RiCloseCircleFill } from "react-icons/ri";
 import uploadService from "../services/uploadService";
@@ -55,9 +53,6 @@ export default function CustomUploadButton({
 
   const currentSrc = src;
   // console.log("currentSrc", currentSrc, "src", src);
-
-  const cld = new Cloudinary({ cloud: { cloudName: "road4u" } });
-  const img = cld.image(src).format("auto").quality("auto");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -157,9 +152,9 @@ export default function CustomUploadButton({
         children
       ) : src ? (
         <Flex bg={"secondaryGray.100"} w={"120px"} h={"100px"} position="relative" px="10px" py="20px" rounded={"8px"}>
-          <Flex w={"full"} h={"full"} overflow="hidden" position="relative" rounded={"4px"} onClick={handleViewImage}>
-            <AdvancedImage cldImg={img} plugins={[lazyload(), responsive()]} />
-          </Flex>
+          <Center w={"full"} h={"full"} overflow="hidden" position="relative" rounded={"4px"} onClick={handleViewImage}>
+            <Image src={src} />
+          </Center>
           <Icon
             as={RiCloseCircleFill}
             bg="white"
@@ -221,7 +216,7 @@ export default function CustomUploadButton({
               overflowY="auto"
             >
               <Center w="full" position="relative" rounded={"4px"}>
-                <AdvancedImage cldImg={img} plugins={[lazyload(), responsive()]} />
+                <Image src={src} />
               </Center>
             </ModalBody>
           </ModalContent>

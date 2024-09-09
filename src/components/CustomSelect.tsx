@@ -99,8 +99,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }, [options]);
 
   React.useEffect(() => {
-    if (isEmpty(value) || isEmpty(value[0])) return;
-
+    if (isEmpty(value)) return;
     setSelectedOptions(value);
   }, [value]);
 
