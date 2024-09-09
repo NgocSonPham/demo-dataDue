@@ -266,7 +266,7 @@ export default function MainCategoryList() {
         </Tbody>
         <Tfoot>
           <Tr>
-            <Td colSpan={5} pb={0} border={0}>
+            <Td colSpan={6} pb={0} border={0}>
               <Flex w="full" align={"center"} justify={"space-between"}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0

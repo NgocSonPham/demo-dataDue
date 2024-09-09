@@ -1,12 +1,16 @@
 import { DeleteIcon, EditIcon, Icon, SearchIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Center,
   Flex,
   IconButton,
+  Image,
   Input,
   InputGroup,
   InputLeftElement,
   Table,
+  Tag,
+  TagLabel,
   Tbody,
   Td,
   Text,
@@ -19,26 +23,32 @@ import {
   useToast
 } from "@chakra-ui/react";
 import React from "react";
-import { FaPlus } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
-import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
 import Pagination from "../../../../components/Pagination";
-import subCategoryService from "../../../../services/subCategoryService";
 import { PAGE_ITEMS } from "../../../../utils/constants";
+import { FaPlus } from "react-icons/fa6";
 import { getErrorMessage } from "../../../../utils/helpers";
+import AppToast from "../../../../components/AppToast";
+import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
+import postService from "../../../../services/postService";
 
 type RowObj = {
   id: number;
-  name: string;
-  idx?: number;
+  thumbnail: string;
+  title: string;
+  shortDescription: string;
   mainCategory: any;
+  subCategory: any;
+  topics?: string[];
+  view: number;
+  like: number;
+  comment: number;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export default function SubCategoryList() {
+export default function PostList() {
   const navigate = useNavigate();
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
@@ -56,7 +66,7 @@ export default function SubCategoryList() {
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
   const init = async () => {
-    const { data: { data: list } = { data: {} } } = await subCategoryService.getAll({
+    const { data: { data: list } = { data: {} } } = await postService.getAll({
       search,
       page,
       pageSize: itemsPerPage
@@ -81,7 +91,7 @@ export default function SubCategoryList() {
   }, [initialized, search]);
 
   const handleEdit = (id: number) => {
-    navigate(`/admin/sub-categories/${id}`);
+    navigate(`/admin/posts/${id}`);
   };
 
   const handleSearch = (value: string) => {
@@ -96,7 +106,7 @@ export default function SubCategoryList() {
 
   const confirmDelete = async (id: number) => {
     try {
-      const { data: { data: _updated } = { data: {} } } = await subCategoryService.delete(id);
+      const { data: { data: _updated } = { data: {} } } = await postService.delete(id);
 
       init();
     } catch (error) {
@@ -142,7 +152,7 @@ export default function SubCategoryList() {
             onChange={(e: any) => handleSearch(e.target.value)}
           />
         </InputGroup>
-        <Button variant="action" onClick={() => navigate("/admin/sub-categories/new")}>
+        <Button variant="action" onClick={() => navigate("/admin/posts/new")}>
           <Icon as={FaPlus} w="15px" h="15px" />
         </Button>
       </Flex>
@@ -179,10 +189,10 @@ export default function SubCategoryList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              w="80px"
+              w="120px"
               px="10px"
             >
-              Thứ tự
+              Thumbnail
             </Th>
             <Th
               textAlign="center"
@@ -190,10 +200,22 @@ export default function SubCategoryList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              w="200px"
+              // w="20%"
+              maxW="100px"
               px="10px"
             >
-              Main Cat
+              Trích dẫn
+            </Th>
+            <Th
+              textAlign="center"
+              borderColor={borderColor}
+              color="gray.400"
+              cursor="pointer"
+              fontSize={{ sm: "10px", lg: "12px" }}
+              px="10px"
+              w="220px"
+            >
+              Topics
             </Th>
             <Th
               textAlign="center"
@@ -232,18 +254,27 @@ export default function SubCategoryList() {
                   </Td>
                   <Td borderColor={borderColor} px="10px">
                     <Text color={textColor} fontSize="sm" noOfLines={1}>
-                      {row.name}
+                      {row.title}
                     </Text>
                   </Td>
                   <Td borderColor={borderColor}>
-                    <Text w="full" color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
-                      {row.idx}
-                    </Text>
+                    <Center w="full">
+                      <Image src={row.thumbnail} alt="post-image" w={"100px"} h={"100px"} objectFit={"contain"} />
+                    </Center>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
-                    <Text color={textColor} fontSize="sm" noOfLines={1} textAlign={"center"}>
-                      {row.mainCategory?.name}
+                    <Text color={textColor} fontSize="sm" noOfLines={2}>
+                      {row.shortDescription}
                     </Text>
+                  </Td>
+                  <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
+                    <Flex w="full" align="center" justify="center" flexWrap={"wrap"} gap="6px">
+                      {row.topics?.map((topic, index) => (
+                        <Tag key={index} variant={"lightBrand"} fontSize="16px" px="10px" py="6px" rounded="full">
+                          <TagLabel>{topic}</TagLabel>
+                        </Tag>
+                      ))}
+                    </Flex>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
                     <Flex align="center">
@@ -283,7 +314,7 @@ export default function SubCategoryList() {
         </Tbody>
         <Tfoot>
           <Tr>
-            <Td colSpan={7} pb={0} border={0}>
+            <Td colSpan={8} pb={0} border={0}>
               <Flex w="full" align={"center"} justify={"space-between"}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0
@@ -300,8 +331,8 @@ export default function SubCategoryList() {
       </Table>
       {isOpenDelete && deletingObj && (
         <CustomConfirmAlert
-          title={`Remove ${deletingObj.name}`}
-          question={"Are you sure to remove this Sub Category?"}
+          title={`Remove ${deletingObj.title}`}
+          question={"Are you sure to remove this Post?"}
           cancelText={"Cancel"}
           confirmText={"Confirm"}
           onClose={onCloseDelete}

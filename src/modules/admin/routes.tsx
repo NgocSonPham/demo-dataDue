@@ -2,16 +2,19 @@ import { Icon } from "@chakra-ui/react";
 import { BsBuildingsFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
+import { IoIosDocument } from "react-icons/io";
 import { MdBarChart, MdOutlineSubject } from "react-icons/md";
 import MainCategoryDetail from "./pages/main-category/MainCategoryDetail";
 import MainCategoryList from "./pages/main-category/MainCategoryList";
 import MajorDetail from "./pages/major/MajorDetail";
 import MajorList from "./pages/major/MajorList";
+import PostList from "./pages/post/PostList";
 import SubCategoryDetail from "./pages/sub-category/SubCategoryDetail";
 import SubCategoryList from "./pages/sub-category/SubCategoryList";
 import TrainingOrganizationDetail from "./pages/training-organization/TrainingOrganizationDetail";
 import TrainingOrganizationList from "./pages/training-organization/TrainingOrganizationList";
 import UserList from "./pages/user/UserList";
+import PostDetail from "./pages/post/PostDetail";
 
 const routes: RoutesType[] = [
   {
@@ -90,6 +93,23 @@ const routes: RoutesType[] = [
     path: "/sub-categories/:id",
     resource: "sub-categories",
     component: <SubCategoryDetail />,
+    level: 0,
+    sidebar: false
+  },
+  {
+    name: "Danh sách bài đăng",
+    path: "/posts",
+    resource: "posts",
+    icon: <Icon as={IoIosDocument} width="20px" height="20px" color="inherit" />,
+    component: <PostList />,
+    level: 0,
+    sidebar: true
+  },
+  {
+    name: "Cập nhật bài đăng",
+    path: "/posts/:id",
+    resource: "posts",
+    component: <PostDetail />,
     level: 0,
     sidebar: false
   },

@@ -86,14 +86,16 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }, [isOpen]);
 
   React.useEffect(() => {
-    setListOptions((prev) => {
-      const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
-      return [...prev, ...uniqueOptions];
-    });
-    setFilteredOptions((prev) => {
-      const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
-      return [...prev, ...uniqueOptions];
-    });
+    // setListOptions((prev) => {
+    //   const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
+    //   return [...prev, ...uniqueOptions];
+    // });
+    // setFilteredOptions((prev) => {
+    //   const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
+    //   return [...prev, ...uniqueOptions];
+    // });
+    setListOptions(options);
+    setFilteredOptions(options);
   }, [options]);
 
   React.useEffect(() => {
