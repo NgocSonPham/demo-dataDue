@@ -250,7 +250,7 @@ export default function PostDetail() {
                   value={value}
                   options={
                     isEmpty(topicList)
-                      ? value.map((item: string) => ({
+                      ? value?.map((item: string) => ({
                           label: item,
                           value: item
                         }))

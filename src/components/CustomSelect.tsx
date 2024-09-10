@@ -44,9 +44,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   ...others
 }) => {
   const [inputValue, setInputValue] = React.useState<string>("");
-  const [listOptions, setListOptions] = React.useState<Array<Option>>(options);
+  const [listOptions, setListOptions] = React.useState<Array<Option>>([]);
   const [selectedOptions, setSelectedOptions] = React.useState<any[]>([]);
-  const [filteredOptions, setFilteredOptions] = React.useState<Array<Option>>(options);
+  const [filteredOptions, setFilteredOptions] = React.useState<Array<Option>>([]);
   const { isOpen, onClose, onToggle } = useDisclosure();
   const ref = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -94,13 +94,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     //   const uniqueOptions = options.filter((option) => !prev.some((item) => item.value === option.value));
     //   return [...prev, ...uniqueOptions];
     // });
-    setListOptions(options);
-    setFilteredOptions(options);
+    setListOptions(options || []);
+    setFilteredOptions(options || []);
   }, [options]);
 
   React.useEffect(() => {
     if (isEmpty(value)) return;
-    setSelectedOptions(value);
+    setSelectedOptions(value.filter((item) => item));
   }, [value]);
 
   React.useEffect(() => {
