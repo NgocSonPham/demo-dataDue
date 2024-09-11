@@ -102,16 +102,40 @@ export default function PostDetail() {
     }
   };
 
+  const initSubCategoryTopics = async (subCategoryId: number) => {
+    try {
+      const {
+        data: { data: list }
+      } = await subCategoryService.getAllTopics(subCategoryId);
+      setTopicList(
+        list.count === 0
+          ? []
+          : list.rows.map((item: any) => ({
+              label: item.name,
+              value: item.name
+            }))
+      );
+    } catch (error) {
+      console.log("init subCat" + error);
+    }
+  };
+
   React.useEffect(() => {
     init();
   }, []);
 
-  const mainCategoryId = watch("mainCategoryId");
+  const { mainCategoryId, subCategoryId } = watch();
   React.useEffect(() => {
     if (!mainCategoryId) return;
 
     initSubCategories(mainCategoryId);
   }, [mainCategoryId]);
+
+  React.useEffect(() => {
+    if (!subCategoryId) return;
+
+    initSubCategoryTopics(subCategoryId);
+  }, [subCategoryId]);
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: any) => {

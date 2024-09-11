@@ -5,13 +5,15 @@ const { stringify } = qs;
 
 const subCategoryService = {
   getAll: function (queryParams: { [key: string]: any }) {
-    return dataServiceAxios.get(isEmpty(queryParams) ? `core/sub-categories` : `core/sub-categories?${stringify(queryParams)}`);
+    return dataServiceAxios.get(
+      isEmpty(queryParams) ? `core/sub-categories` : `core/sub-categories?${stringify(queryParams)}`
+    );
   },
   getById: function (id: number | string) {
     return dataServiceAxios.get(`core/sub-categories/${id}`);
   },
-  dashboard: function (id: number | string) {
-    return dataServiceAxios.get(`core/sub-categories/${id}/dashboard`);
+  getAllTopics: function (id: number | string) {
+    return dataServiceAxios.get(`core/sub-categories/${id}/topics`);
   },
   create: function (data: any) {
     return dataServiceAxios.post(`core/sub-categories`, data);
@@ -21,7 +23,7 @@ const subCategoryService = {
   },
   delete: function (id: number) {
     return dataServiceAxios.delete(`core/sub-categories/${id}`);
-  },
+  }
 };
 
 export default subCategoryService;
