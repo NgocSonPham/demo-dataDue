@@ -99,7 +99,7 @@ export const Login = () => {
         maxW="500px"
       >
         <HStack align={"center"} justify={"center"} spacing="10px">
-          <Image src={"/vite.svg"} w="40px" h="40px" />
+          <Image src={"/logo.svg"} w="40px" h="40px" />
           <Text fontSize="2xl" fontWeight={600} color={"navy.700"}>
             {"Data Dude"}
           </Text>
