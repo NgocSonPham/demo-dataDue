@@ -99,10 +99,10 @@ export const Login = () => {
   const handleAppleSignIn = async () => {
     try {
       const response: any = await window.AppleID.auth.signIn();
-      const { authorization } = response;
+      const { authorization, user: appleUser } = response;
       const { id_token: idToken } = authorization;
 
-      // console.log("Apple Sign In response:", response, idToken);
+      console.log("Apple Sign In response:", appleUser);
 
       const { data: { data: user } = { data: {} } } = await authService.signInByApple({ idToken });
       dispatch(setUser(user));
