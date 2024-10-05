@@ -103,7 +103,8 @@ export const Login = () => {
       .then((response: any) => {
         const { authorization, user } = response;
         const { id_token } = authorization;
-
+        
+        console.log("token:", id_token);
         // Check if user info is present (this happens only on first sign-in)
         if (user) {
           const { email, name } = user;
@@ -113,7 +114,6 @@ export const Login = () => {
           console.log("User Email:", email);
           console.log("User First Name:", firstName);
           console.log("User Last Name:", lastName);
-          console.log("token:", id_token);
         }
       })
       .catch((error: any) => {
