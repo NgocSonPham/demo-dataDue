@@ -15,6 +15,7 @@ import "./styles/slick.css";
 import theme from "./theme/theme";
 import { getErrorMessage } from "./utils/helpers";
 import { Social } from "./modules/auth/Social";
+import { LoginApple } from "./modules/auth/LoginApple";
 
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -52,6 +53,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/admin" />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/login/apple" element={<LoginApple />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/social" element={<Social />} />
                 <Route path="/admin/*" element={<Admin />} />

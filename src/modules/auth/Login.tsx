@@ -10,7 +10,7 @@ import {
   Link,
   Stack,
   Text,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
@@ -31,6 +31,7 @@ import authService from "../../services/authService";
 import { USER_ROLE } from "../../utils/constants";
 import { userFullnameOrUsername } from "../../utils/helpers";
 import { handleEnterKeyPress } from "../../utils/keyboard";
+import { FaApple } from "react-icons/fa6";
 
 type FormType = {
   username: string;
@@ -49,17 +50,26 @@ export const Login = () => {
 
   React.useEffect(() => {
     if (isEmpty(user?.id?.toString())) return;
-    [USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)
-      ? navigate("/admin")
-      : navigate("/");
+    [USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId) ? navigate("/admin") : navigate("/");
   }, [user, navigate]);
+
+  React.useEffect(() => {
+    console.log("Apple Sign In Init", import.meta.env.VITE_APPLE_BUNDLE_ID);
+    // Configure Apple Sign In on page load
+    window.AppleID.auth.init({
+      clientId: import.meta.env.VITE_APPLE_BUNDLE_ID, // Apple Service ID
+      scope: "name email", // Permissions
+      redirectURI: "https://datadude.io.vn/login/apple", // Redirect URI from Apple setup
+      usePopup: true // Use popup to stay in the same window
+    });
+  }, []);
 
   const defaultValues = {
     username: "",
-    password: "",
+    password: ""
   };
   const { control, handleSubmit: onSubmit } = useForm<FormType>({
-    defaultValues,
+    defaultValues
   });
 
   const { mutate, isLoading } = useMutation({
@@ -78,26 +88,42 @@ export const Login = () => {
             subtitle={`Chào mừng ${userFullnameOrUsername(user)} trở lại!`}
             onClose={onClose}
           />
-        ),
+        )
       });
-    },
+    }
   });
 
   const handleSubmit: SubmitHandler<FormType> = (data) => {
     mutate(data);
   };
 
+  const handleAppleSignIn = () => {
+    window.AppleID.auth
+      .signIn()
+      .then((response: any) => {
+        const { authorization, user } = response;
+        const { id_token } = authorization;
+
+        // Check if user info is present (this happens only on first sign-in)
+        if (user) {
+          const { email, name } = user;
+          const firstName = name?.firstName;
+          const lastName = name?.lastName;
+
+          console.log("User Email:", email);
+          console.log("User First Name:", firstName);
+          console.log("User Last Name:", lastName);
+          console.log("token:", id_token);
+        }
+      })
+      .catch((error: any) => {
+        console.error("Apple Sign In error:", error);
+      });
+  };
+
   return (
     <Center w="100vw" h="100vh" bg={"gray.50"}>
-      <Stack
-        rounded={"lg"}
-        bg={"white"}
-        boxShadow={"lg"}
-        px={"40px"}
-        py={"32px"}
-        spacing={"20px"}
-        maxW="500px"
-      >
+      <Stack rounded={"lg"} bg={"white"} boxShadow={"lg"} px={"40px"} py={"32px"} spacing={"20px"} maxW="500px">
         <HStack align={"center"} justify={"center"} spacing="10px">
           <Image src={"/logo.svg"} w="40px" h="40px" />
           <Text fontSize="2xl" fontWeight={600} color={"navy.700"}>
@@ -128,7 +154,7 @@ export const Login = () => {
             name="username"
             control={control}
             rules={{
-              required: "Tên người dùng hoặc Email không được để trống",
+              required: "Tên người dùng hoặc Email không được để trống"
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CustomInput
@@ -150,10 +176,7 @@ export const Login = () => {
               name="password"
               control={control}
               rules={{ required: "Mật khẩu không được để trống" }}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <CustomInput
                   placeholder="Nhập mật khẩu"
                   type={show ? "text" : "password"}
@@ -175,11 +198,7 @@ export const Login = () => {
               )}
             />
           </Stack>
-          <Stack
-            direction={{ base: "column", sm: "row" }}
-            align={"start"}
-            justify={"space-between"}
-          >
+          <Stack direction={{ base: "column", sm: "row" }} align={"start"} justify={"space-between"}>
             <Checkbox
               sx={{
                 ".chakra-checkbox__control": {
@@ -190,27 +209,23 @@ export const Login = () => {
                     color: "white",
                     _hover: {
                       bg: "brandScheme.400",
-                      borderColor: "brandScheme.400",
-                    },
+                      borderColor: "brandScheme.400"
+                    }
                   },
                   _hover: {
                     bg: "brandScheme.400",
-                    borderColor: "brandScheme.400",
-                  },
+                    borderColor: "brandScheme.400"
+                  }
                 },
                 ".chakra-checkbox__label": {
                   fontSize: "14px",
-                  fontWeight: "400",
-                },
+                  fontWeight: "400"
+                }
               }}
             >
               {t("auth.rememberMe")}
             </Checkbox>
-            <Link
-              color={"brand.600"}
-              fontSize={"14px"}
-              _hover={{ textDecoration: "none" }}
-            >
+            <Link color={"brand.600"} fontSize={"14px"} _hover={{ textDecoration: "none" }}>
               {t("auth.forgotPassword")}
             </Link>
           </Stack>
@@ -254,15 +269,28 @@ export const Login = () => {
               </HStack>
             </Center>
           </Link>
+          <Link
+            // href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
+            isExternal
+            py="15px"
+            h="50px"
+            rounded="16px"
+            bg={"secondaryGray.300"}
+            color={"navy.700"}
+            _hover={{ textDecoration: "none" }}
+            onClick={handleAppleSignIn}
+          >
+            <Center w="full">
+              <HStack align={"center"} spacing={"10px"}>
+                <Icon as={FaApple} w="20px" h="20px" />
+                <Text fontSize="sm" fontWeight="600">
+                  {"Đăng nhập bằng Apple"}
+                </Text>
+              </HStack>
+            </Center>
+          </Link>
         </Stack>
-        <Text
-          w="full"
-          color="gray.600"
-          fontSize="11px"
-          fontWeight="400"
-          letterSpacing="-0.056px"
-          textAlign={"center"}
-        >
+        <Text w="full" color="gray.600" fontSize="11px" fontWeight="400" letterSpacing="-0.056px" textAlign={"center"}>
           {`Bằng việc đăng nhập, bạn xác nhận rằng bạn đã đọc, hiểu và đồng ý với `}
           <Link
             href="/terms"
