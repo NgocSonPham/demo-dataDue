@@ -57,7 +57,7 @@ export const Login = () => {
     console.log("Apple Sign In Init", import.meta.env.VITE_APPLE_BUNDLE_ID);
     // Configure Apple Sign In on page load
     window.AppleID.auth.init({
-      clientId: import.meta.env.VITE_APPLE_BUNDLE_ID, // Apple Service ID
+      clientId: import.meta.env.VITE_APPLE_SERVICES_ID, // Apple Service ID
       scope: "name email", // Permissions
       redirectURI: "https://datadude.io.vn/login/apple", // Redirect URI from Apple setup
       usePopup: true // Use popup to stay in the same window
