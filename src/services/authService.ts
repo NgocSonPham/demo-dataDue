@@ -7,6 +7,9 @@ const authService = {
   signInByEmailOrUsername: function (data: any) {
     return dataServiceAxios.post("core/auth/signin/email", data);
   },
+  signInByApple: function (data: any) {
+    return dataServiceAxios.post(`core/auth/signin/apple`, data);
+  }
 };
 
 export default authService;

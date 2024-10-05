@@ -97,28 +97,24 @@ export const Login = () => {
     mutate(data);
   };
 
-  const handleAppleSignIn = () => {
-    window.AppleID.auth
-      .signIn()
-      .then((response: any) => {
-        const { authorization, user } = response;
-        const { id_token } = authorization;
-        
-        console.log("token:", id_token);
-        // Check if user info is present (this happens only on first sign-in)
-        if (user) {
-          const { email, name } = user;
-          const firstName = name?.firstName;
-          const lastName = name?.lastName;
+  const handleAppleSignIn = async () => {
+    try {
+      const response: any = await window.AppleID.auth.signIn();
+      const { authorization } = response;
+      const { id_token: idToken } = authorization;
 
-          console.log("User Email:", email);
-          console.log("User First Name:", firstName);
-          console.log("User Last Name:", lastName);
-        }
-      })
-      .catch((error: any) => {
-        console.error("Apple Sign In error:", error);
+      const { data: { data: user } = { data: {} } } = await authService.signInByApple({ idToken });
+      dispatch(setUser(user));
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => (
+          <AppToast title={"SUCCESS"} subtitle={`Chào mừng ${userFullnameOrUsername(user)}!`} onClose={onClose} />
+        )
       });
+    } catch (error) {
+      console.error("Apple Sign In error:", error);
+    }
   };
 
   return (
