@@ -106,8 +106,8 @@ export const Login = () => {
         idToken,
         ...(appleUser && {
           email: appleUser.email,
-          firstname: appleUser.name?.firstname,
-          lastname: appleUser.name?.lastname
+          firstname: appleUser.name?.firstname || "",
+          lastname: appleUser.name?.lastname || ""
         })
       });
       dispatch(setUser(user));
