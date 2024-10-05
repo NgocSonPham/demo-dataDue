@@ -29,7 +29,7 @@ import { useAppSelector } from "../../hooks/useAppSelector";
 import { selectUser, setUser } from "../../redux/slice";
 import authService from "../../services/authService";
 import { USER_ROLE } from "../../utils/constants";
-import { userFullnameOrUsername } from "../../utils/helpers";
+import { getErrorMessage, userFullnameOrUsername } from "../../utils/helpers";
 import { handleEnterKeyPress } from "../../utils/keyboard";
 import { FaApple } from "react-icons/fa6";
 
@@ -54,7 +54,6 @@ export const Login = () => {
   }, [user, navigate]);
 
   React.useEffect(() => {
-    console.log("Apple Sign In Init", import.meta.env.VITE_APPLE_BUNDLE_ID);
     // Configure Apple Sign In on page load
     window.AppleID.auth.init({
       clientId: import.meta.env.VITE_APPLE_SERVICES_ID, // Apple Service ID
@@ -103,7 +102,7 @@ export const Login = () => {
       const { authorization } = response;
       const { id_token: idToken } = authorization;
 
-      console.log("Apple Sign In response:", response, idToken);
+      // console.log("Apple Sign In response:", response, idToken);
 
       const { data: { data: user } = { data: {} } } = await authService.signInByApple({ idToken });
       dispatch(setUser(user));
@@ -115,7 +114,12 @@ export const Login = () => {
         )
       });
     } catch (error) {
-      console.error("Apple Sign In error:", error);
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} title={"Error"} subtitle={message} onClose={onClose} />
+      });
     }
   };
 
