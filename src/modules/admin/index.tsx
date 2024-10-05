@@ -19,10 +19,7 @@ export const Admin = () => {
         return navigate("/login");
       }
 
-      if (
-        location.pathname.includes("/admin") &&
-        ![USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)
-      ) {
+      if (location.pathname.includes("/admin") && ![USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)) {
         return navigate("/");
       }
     }
@@ -45,9 +42,7 @@ export const Admin = () => {
       <Routes>
         {routes.map((route: RoutesType, key: any) => {
           if (route.component && route.noLayout) {
-            return (
-              <Route path={route.path} element={route.component} key={key} />
-            );
+            return <Route path={route.path} element={route.component} key={key} />;
           } else {
             return null;
           }

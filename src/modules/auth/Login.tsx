@@ -102,9 +102,14 @@ export const Login = () => {
       const { authorization, user: appleUser } = response;
       const { id_token: idToken } = authorization;
 
-      console.log("Apple Sign In response:", appleUser);
-
-      const { data: { data: user } = { data: {} } } = await authService.signInByApple({ idToken });
+      const { data: { data: user } = { data: {} } } = await authService.signInByApple({
+        idToken,
+        ...(appleUser && {
+          email: appleUser.email,
+          firstname: appleUser.name?.firstname,
+          lastname: appleUser.name?.lastname
+        })
+      });
       dispatch(setUser(user));
 
       toast({
