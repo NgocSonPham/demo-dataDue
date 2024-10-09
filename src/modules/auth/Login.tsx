@@ -61,6 +61,44 @@ export const Login = () => {
       redirectURI: "https://datadude.io.vn/login/apple", // Redirect URI from Apple setup
       usePopup: true // Use popup to stay in the same window
     });
+
+    // if (window.google) {
+    //   console.log("Google API is loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+    //   window.google.accounts.id.initialize({
+    //     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Google OAuth Client ID của bạn
+    //     callback: handleGoogleSignIn
+    //   });
+
+    //   // Render nút đăng nhập
+    //   window.google.accounts.id.renderButton(
+    //     document.getElementById("googleSignInButton"), // ID của phần tử HTML chứa nút
+    //     {
+    //       theme: "outline",
+    //       size: "large"
+    //     }
+    //   );
+    // }
+
+    const loadGoogleAPI = () => {
+      if (window.google) {
+        console.log("Google API loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn
+        });
+      }
+    };
+
+    if (!window.google) {
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.onload = loadGoogleAPI;
+      document.body.appendChild(script);
+    } else {
+      loadGoogleAPI();
+    }
   }, []);
 
   const defaultValues = {
@@ -109,6 +147,32 @@ export const Login = () => {
           firstname: appleUser.name?.firstname || "",
           lastname: appleUser.name?.lastname || ""
         })
+      });
+      dispatch(setUser(user));
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => (
+          <AppToast title={"SUCCESS"} subtitle={`Chào mừng ${userFullnameOrUsername(user)}!`} onClose={onClose} />
+        )
+      });
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} title={"Error"} subtitle={message} onClose={onClose} />
+      });
+    }
+  };
+
+  const handleGoogleSignIn = async (response: any) => {
+    try {
+      const idToken = response.credential;
+      console.log("Google Sign In", idToken);
+
+      const { data: { data: user } = { data: {} } } = await authService.signInByApple({
+        idToken
       });
       dispatch(setUser(user));
 
@@ -257,8 +321,8 @@ export const Login = () => {
             </Text>
             <HSeparator />
           </Flex>
-          <Link
-            href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
+          {/* <Link
+            // href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
             isExternal
             py="15px"
             h="50px"
@@ -266,17 +330,27 @@ export const Login = () => {
             bg={"secondaryGray.300"}
             color={"navy.700"}
             _hover={{ textDecoration: "none" }}
+          > */}
+          <Center
+            // id="googleSignInButton"
+            w="full"
+            py="15px"
+            h="50px"
+            rounded="16px"
+            bg={"secondaryGray.300"}
+            color={"navy.700"}
+            cursor={"pointer"}
+            onClick={() => window.google.accounts.id.prompt()}
           >
-            <Center w="full">
-              <HStack align={"center"} spacing={"10px"}>
-                <Icon as={FcGoogle} w="20px" h="20px" />
-                <Text fontSize="sm" fontWeight="600">
-                  {"Đăng nhập bằng Google"}
-                </Text>
-              </HStack>
-            </Center>
-          </Link>
-          <Link
+            <HStack align={"center"} spacing={"10px"}>
+              <Icon as={FcGoogle} w="20px" h="20px" />
+              <Text fontSize="sm" fontWeight="600">
+                {"Đăng nhập bằng Google"}
+              </Text>
+            </HStack>
+          </Center>
+          {/* </Link> */}
+          {/* <Link
             // href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
             isExternal
             py="15px"
@@ -286,16 +360,25 @@ export const Login = () => {
             color={"navy.700"}
             _hover={{ textDecoration: "none" }}
             onClick={handleAppleSignIn}
+          > */}
+          <Center
+            w="full"
+            py="15px"
+            h="50px"
+            rounded="16px"
+            bg={"secondaryGray.300"}
+            color={"navy.700"}
+            cursor={"pointer"}
+            onClick={handleAppleSignIn}
           >
-            <Center w="full">
-              <HStack align={"center"} spacing={"10px"}>
-                <Icon as={FaApple} w="20px" h="20px" />
-                <Text fontSize="sm" fontWeight="600">
-                  {"Đăng nhập bằng Apple"}
-                </Text>
-              </HStack>
-            </Center>
-          </Link>
+            <HStack align={"center"} spacing={"10px"}>
+              <Icon as={FaApple} w="20px" h="20px" />
+              <Text fontSize="sm" fontWeight="600">
+                {"Đăng nhập bằng Apple"}
+              </Text>
+            </HStack>
+          </Center>
+          {/* </Link> */}
         </Stack>
         <Text w="full" color="gray.600" fontSize="11px" fontWeight="400" letterSpacing="-0.056px" textAlign={"center"}>
           {`Bằng việc đăng nhập, bạn xác nhận rằng bạn đã đọc, hiểu và đồng ý với `}

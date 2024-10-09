@@ -16,6 +16,7 @@ import theme from "./theme/theme";
 import { getErrorMessage } from "./utils/helpers";
 import { Social } from "./modules/auth/Social";
 import { LoginApple } from "./modules/auth/LoginApple";
+import { LoginGoogle } from "./modules/auth/LoginGoogle";
 
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/admin" />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/login/apple" element={<LoginApple />} />
+                <Route path="/login/google" element={<LoginGoogle />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/social" element={<Social />} />
                 <Route path="/admin/*" element={<Admin />} />
