@@ -9,6 +9,9 @@ const authService = {
   },
   signInByApple: function (data: any) {
     return dataServiceAxios.post(`core/auth/signin/apple`, data);
+  },
+  signInByGoogle: function (data: any) {
+    return dataServiceAxios.post(`core/auth/signin/google`, data);
   }
 };
 

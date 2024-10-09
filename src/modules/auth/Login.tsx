@@ -62,26 +62,8 @@ export const Login = () => {
       usePopup: true // Use popup to stay in the same window
     });
 
-    // if (window.google) {
-    //   console.log("Google API is loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
-    //   window.google.accounts.id.initialize({
-    //     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Google OAuth Client ID của bạn
-    //     callback: handleGoogleSignIn
-    //   });
-
-    //   // Render nút đăng nhập
-    //   window.google.accounts.id.renderButton(
-    //     document.getElementById("googleSignInButton"), // ID của phần tử HTML chứa nút
-    //     {
-    //       theme: "outline",
-    //       size: "large"
-    //     }
-    //   );
-    // }
-
     const loadGoogleAPI = () => {
       if (window.google) {
-        console.log("Google API loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
         window.google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleGoogleSignIn
@@ -169,9 +151,8 @@ export const Login = () => {
   const handleGoogleSignIn = async (response: any) => {
     try {
       const idToken = response.credential;
-      console.log("Google Sign In", idToken);
 
-      const { data: { data: user } = { data: {} } } = await authService.signInByApple({
+      const { data: { data: user } = { data: {} } } = await authService.signInByGoogle({
         idToken
       });
       dispatch(setUser(user));
@@ -321,18 +302,7 @@ export const Login = () => {
             </Text>
             <HSeparator />
           </Flex>
-          {/* <Link
-            // href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
-            isExternal
-            py="15px"
-            h="50px"
-            rounded="16px"
-            bg={"secondaryGray.300"}
-            color={"navy.700"}
-            _hover={{ textDecoration: "none" }}
-          > */}
           <Center
-            // id="googleSignInButton"
             w="full"
             py="15px"
             h="50px"
@@ -349,18 +319,6 @@ export const Login = () => {
               </Text>
             </HStack>
           </Center>
-          {/* </Link> */}
-          {/* <Link
-            // href={`https://c4uroadmap-dev-s2j4nofseq-de.a.run.app/api/v1/core/auth/google`}
-            isExternal
-            py="15px"
-            h="50px"
-            rounded="16px"
-            bg={"secondaryGray.300"}
-            color={"navy.700"}
-            _hover={{ textDecoration: "none" }}
-            onClick={handleAppleSignIn}
-          > */}
           <Center
             w="full"
             py="15px"
@@ -378,7 +336,6 @@ export const Login = () => {
               </Text>
             </HStack>
           </Center>
-          {/* </Link> */}
         </Stack>
         <Text w="full" color="gray.600" fontSize="11px" fontWeight="400" letterSpacing="-0.056px" textAlign={"center"}>
           {`Bằng việc đăng nhập, bạn xác nhận rằng bạn đã đọc, hiểu và đồng ý với `}
