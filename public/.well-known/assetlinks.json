@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.datadude",
+      "sha256_cert_fingerprints": [
+        "68:04:94:39:AD:58:EE:78:8E:53:56:A6:7C:4C:9E:58:81:E8:25:15:0A:31:A5:DC:9A:B6:F0:F9:0E:FD:02:98"
+      ]
+    }
+  }
+]
