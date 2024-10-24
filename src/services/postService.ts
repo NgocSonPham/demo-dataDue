@@ -1,11 +1,11 @@
 import { isEmpty } from "lodash";
+import qs from "query-string";
 import dataServiceAxios from "./baseService";
+const { stringify } = qs;
 
 const postService = {
-  getAll: function (queryParams: { [key: string]: any }, page: number, pageSize: number) {
-    return dataServiceAxios.get(
-      `core/posts?page=${page}&pageSize=${pageSize}${isEmpty(queryParams) ? `` : `&filter=${encodeURIComponent(JSON.stringify(queryParams))}`}`
-    );
+  getAll: function (queryParams: { [key: string]: any }) {
+    return dataServiceAxios.get(isEmpty(queryParams) ? `core/posts` : `core/posts?${stringify(queryParams)}`);
   },
   getById: function (id: number | string) {
     return dataServiceAxios.get(`core/posts/${id}`);

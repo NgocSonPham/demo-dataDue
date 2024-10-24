@@ -66,11 +66,11 @@ export default function PostList() {
   const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure();
 
   const init = async () => {
-    const { data: { data: list } = { data: {} } } = await postService.getAll(
-      { title: search, mainCategoryId: 3 },
+    const { data: { data: list } = { data: {} } } = await postService.getAll({
       page,
-      itemsPerPage
-    );
+      pageSize: itemsPerPage,
+      filter: JSON.stringify({ title: search })
+    });
     setTotalItems(list.count);
     setList(list.rows);
     setInitialized(true);
