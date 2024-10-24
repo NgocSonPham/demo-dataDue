@@ -4,14 +4,12 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock* ./
-COPY ckeditor5 ./ckeditor5
 RUN yarn --frozen-lockfile
 
 FROM base AS builder
 ARG env
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/ckeditor5 ./ckeditor5
 COPY . .
 RUN yarn build:${env}
 
