@@ -10,20 +10,20 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
+import { isEmpty } from "lodash";
 import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
 import CustomInput from "../../../../components/CustomInput";
-import { getErrorMessage } from "../../../../utils/helpers";
-import CustomUploadButton from "../../../../components/CustomUploadButton";
 import CustomSelect from "../../../../components/CustomSelect";
-import postService from "../../../../services/postService";
+import CustomUploadButton from "../../../../components/CustomUploadButton";
 import mainCategoryService from "../../../../services/mainCategoryService";
+import postService from "../../../../services/postService";
 import subCategoryService from "../../../../services/subCategoryService";
-import C4UCKeditor from "./C4UCKeditor";
-import { isEmpty } from "lodash";
+import { getErrorMessage } from "../../../../utils/helpers";
+import HtmlEditor from "./HtmlEditor";
 
 type FormType = {
   id?: string;
@@ -184,7 +184,7 @@ export default function PostDetail() {
       </CustomCard>
     );
   }
-  
+
   return (
     <CustomCard flexDirection="column" w="100%" minH="83vh" px="10px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Stack w="full" direction={{ base: "column", xl: "row" }} spacing={0} align="flex-start">
@@ -292,13 +292,7 @@ export default function PostDetail() {
             name="content"
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <FormControl isInvalid={!!error} id="tags">
-                <C4UCKeditor
-                  data={value}
-                  onDataChange={(_e, editor) => {
-                    const newData = editor.getData();
-                    onChange(newData);
-                  }}
-                />
+                <HtmlEditor />
 
                 {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
               </FormControl>

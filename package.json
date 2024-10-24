@@ -34,7 +34,6 @@
     "@tanstack/react-query": "^4.29.19",
     "@tinymce/tinymce-react": "^4.3.0",
     "@types/react-slick": "^0.23.11",
-    "antd": "^5.4.7",
     "axios": "^1.4.0",
     "ckeditor5-custom-build": "file:ckeditor5",
     "dayjs": "^1.11.11",
@@ -59,11 +58,15 @@
     "react-router-dom": "^6.11.1",
     "react-slick": "^0.30.2",
     "reactflow": "^11.7.4",
+    "reactjs-tiptap-editor": "^0.0.55",
     "redux-persist": "^6.0.0",
     "serve": "^14.2.3",
     "slick-carousel": "^1.8.1",
     "use-undoable": "^5.0.0",
-    "vite-plugin-commonjs": "^0.10.1"
+    "vite-plugin-commonjs": "^0.10.1",
+    "y-prosemirror": "^1.2.12",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.20"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
