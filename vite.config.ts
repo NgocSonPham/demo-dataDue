@@ -1,11 +1,10 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import compressPlugin from "vite-plugin-compress";
 import eslintPlugin from "vite-plugin-eslint";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), eslintPlugin(), compressPlugin()],
+  plugins: [react(), eslintPlugin()],
   build: {
     sourcemap: true,
     chunkSizeWarningLimit: 1500,
