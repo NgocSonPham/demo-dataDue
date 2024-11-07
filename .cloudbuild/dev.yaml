@@ -10,8 +10,6 @@ steps:
         "env=dev",
         "--network",
         "cloudbuild",
-        "--build-arg",
-        "NODE_OPTIONS=--max-old-space-size=4096",
         "."
       ]
   # Push the container image to Container Registry

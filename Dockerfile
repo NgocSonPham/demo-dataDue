@@ -11,6 +11,9 @@ ARG env
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 RUN yarn build:${env}
 
 FROM base AS runner

@@ -6,7 +6,7 @@ import eslintPlugin from "vite-plugin-eslint";
 export default defineConfig({
   plugins: [react(), eslintPlugin()],
   build: {
-    sourcemap: true,
+    sourcemap: false,
     chunkSizeWarningLimit: 1500,
     emptyOutDir: true,
     minify: true,
