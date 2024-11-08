@@ -21,7 +21,7 @@ FROM base AS runner
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public
+# COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./
 
 ENV NEXT_TELEMETRY_DISABLED 1
@@ -37,5 +37,8 @@ RUN echo "const express = require('express');" > server.js && \
     echo "});" >> server.js && \
     echo "app.listen(PORT, () => console.log('Server running on port ' + PORT));" >> server.js
 
+# Expose the port Cloud Run will use
 EXPOSE 8080
+
+# Start the server
 CMD ["node", "server.js"]
