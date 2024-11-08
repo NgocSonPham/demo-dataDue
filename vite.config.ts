@@ -6,12 +6,11 @@ import eslintPlugin from "vite-plugin-eslint";
 export default defineConfig({
   plugins: [react(), eslintPlugin()],
   build: {
-    sourcemap: false,
+    sourcemap: true,
     chunkSizeWarningLimit: 1500,
     emptyOutDir: true,
     minify: true,
     rollupOptions: {
-      external: ["oniguruma-to-js"],
       output: {
         manualChunks: {
           chakra: ["@chakra-ui/react", "@emotion/react", "@emotion/styled"],
@@ -24,8 +23,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ["react", "react-dom"],
-    exclude: ["@chakra-ui/react", "reactjs-tiptap-editor"]
+    include: ["react", "react-dom"]
   },
   server: {
     port: 5000
