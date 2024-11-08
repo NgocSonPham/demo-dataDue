@@ -26,6 +26,8 @@ steps:
       - "gcr.io/$PROJECT_ID/datadude-portal-dev:$COMMIT_SHA"
       - "--region"
       - "asia-east1"
+      - "--set-env-vars"
+      - "PORT=8080"
 
 images:
   - "gcr.io/$PROJECT_ID/datadude-portal-dev:$COMMIT_SHA"
