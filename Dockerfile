@@ -1,6 +1,8 @@
 # Base image
 FROM node:18-alpine as base
 
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock* ./
 RUN yarn --frozen-lockfile
@@ -12,10 +14,15 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN yarn build:${env}
 
 # Setup Express server to handle custom MIME
-FROM node:18-alpine
+FROM base AS runner
 WORKDIR /app
 
-COPY --from=base /app /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
+
+ENV NEXT_TELEMETRY_DISABLED 1
 
 # Install Express and serve-static
 RUN yarn add express serve-static
