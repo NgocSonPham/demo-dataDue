@@ -11,10 +11,6 @@ export default defineConfig({
     emptyOutDir: true,
     minify: true,
     rollupOptions: {
-      input: {
-        main: 'index.html',
-        'apple-app-site-association': '.well-known/apple-app-site-association'
-      },
       output: {
         manualChunks: {
           chakra: ["@chakra-ui/react", "@emotion/react", "@emotion/styled"],
