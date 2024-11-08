@@ -5,6 +5,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock* ./
 RUN yarn --frozen-lockfile
+RUN yarn add express serve-static
 
 FROM base AS builder
 ARG env
@@ -24,9 +25,6 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./
 
 ENV NEXT_TELEMETRY_DISABLED 1
-
-# Install Express and serve-static
-RUN yarn add express serve-static
 
 # Create server.js with custom MIME handling
 RUN echo "const express = require('express');" > server.js && \
