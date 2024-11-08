@@ -29,13 +29,13 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Create server.js with custom MIME handling
 RUN echo "const express = require('express');" > server.js && \
     echo "const app = express();" >> server.js && \
-    echo "const PORT = process.env.PORT || 8080;" >> server.js && \
+    echo "const port = parseInt(process.env.PORT) || 8080;" >> server.js && \
     echo "app.use(express.static('dist'));" >> server.js && \
     echo "app.get('/.well-known/apple-app-site-association', (req, res) => {" >> server.js && \
     echo "  res.type('application/json');" >> server.js && \
     echo "  res.sendFile(__dirname + '/dist/.well-known/apple-app-site-association');" >> server.js && \
     echo "});" >> server.js && \
-    echo "app.listen(PORT, () => console.log('Server running on port ' + PORT));" >> server.js
+    echo "app.listen(port, () => console.log('Server running on port ' + port));" >> server.js
 
 # Expose the port Cloud Run will use
 EXPOSE 8080
