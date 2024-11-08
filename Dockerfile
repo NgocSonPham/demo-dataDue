@@ -7,7 +7,9 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
+RUN yarn build:${env}
 
 # Setup Express server to handle custom MIME
 FROM node:18-alpine
