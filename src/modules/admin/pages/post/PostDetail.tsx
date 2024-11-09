@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Center,
   FormControl,
@@ -287,19 +288,21 @@ export default function PostDetail() {
               </FormControl>
             )}
           />
-          <Controller
-            control={control}
-            name="content"
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <FormControl isInvalid={!!error} id="tags">
-                <HtmlEditor />
-
-                {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-              </FormControl>
-            )}
-          />
         </VStack>
       </Stack>
+      <Box w="full" px={3} mt={5}>
+        <Controller
+          control={control}
+          name="content"
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <FormControl isInvalid={!!error} id="tags">
+              <HtmlEditor content={value} onChange={onChange} />
+
+              {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+            </FormControl>
+          )}
+        />
+      </Box>
       <HStack p={4} spacing={5}>
         <Button isLoading={isLoading} onClick={onSubmit(handleSubmit)} variant={"brand"}>
           {"Lưu bài đăng"}
