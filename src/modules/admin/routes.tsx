@@ -15,6 +15,7 @@ import TrainingOrganizationDetail from "./pages/training-organization/TrainingOr
 import TrainingOrganizationList from "./pages/training-organization/TrainingOrganizationList";
 import UserList from "./pages/user/UserList";
 import PostDetail from "./pages/post/PostDetail";
+import RoadmapList from "./pages/roadmap/RoadmapList";
 
 const routes: RoutesType[] = [
   {
@@ -112,6 +113,15 @@ const routes: RoutesType[] = [
     component: <PostDetail />,
     level: 0,
     sidebar: false
+  },
+  {
+    name: "Danh sách Roadmap",
+    path: "/roadmaps",
+    resource: "roadmaps",
+    icon: <Icon as={IoIosDocument} width="20px" height="20px" color="inherit" />,
+    component: <RoadmapList />,
+    level: 0,
+    sidebar: true
   },
   {
     name: "Danh sách Người dùng",

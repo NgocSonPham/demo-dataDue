@@ -24,7 +24,7 @@ import mainCategoryService from "../../../../services/mainCategoryService";
 import postService from "../../../../services/postService";
 import subCategoryService from "../../../../services/subCategoryService";
 import { getErrorMessage } from "../../../../utils/helpers";
-import HtmlEditor from "./HtmlEditor";
+import HtmlEditor from "../../../../components/HtmlEditor";
 
 type FormType = {
   id?: string;
