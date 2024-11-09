@@ -37,10 +37,5 @@ RUN echo "const express = require('express');" > server.js && \
     echo "});" >> server.js && \
     echo "app.listen(port, () => console.log('Server running on port ' + port));" >> server.js
 
-# Expose the port Cloud Run will use
-EXPOSE 8080
-
-ENV PORT 8080
-
 # Start the server
 CMD ["node", "server.js"]
