@@ -1,4 +1,3 @@
-import qs from "query-string";
 import dataServiceAxios from "./baseService";
 
 const specialityService = {
@@ -7,6 +6,12 @@ const specialityService = {
   },
   getById: function (id: number) {
     return dataServiceAxios.get(`core/specialities/${id}`);
+  },
+  increaseLevel: function (id: number | string) {
+    return dataServiceAxios.patch(`core/specialities/${id}`);
+  },
+  deleteLevel: function (id: number | string, levelId: number) {
+    return dataServiceAxios.patch(`core/specialities/${id}/level/${levelId}`);
   }
 };
 

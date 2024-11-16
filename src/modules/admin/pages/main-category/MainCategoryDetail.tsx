@@ -117,10 +117,7 @@ export default function MainCategoryDetail() {
               <CustomInputNumber
                 label="Thứ tự"
                 value={value}
-                onChange={(e: any) => {
-                  const value = e?.target.value ?? 0;
-                  onChange(value);
-                }}
+                onChange={(value) => onChange(value)}
               />
             )}
           />

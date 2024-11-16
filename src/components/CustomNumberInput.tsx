@@ -20,7 +20,6 @@ interface Props extends FormControlProps {
   error?: any;
   label?: string;
   isRequired?: boolean;
-
   value: number;
   onChange: (event: any) => void;
   min?: number;
@@ -83,19 +82,26 @@ export const CustomInputNumber: FC<Props> = ({
             fontWeight="400"
             outline="none"
             boxShadow="none"
-            border="1px solid transparent"
+            border="0px"
+            borderColor={"transparent"}
             letterSpacing={"-0.2px"}
             lineHeight="24px"
             px="10px"
             _hover={{
-              border: "1px solid transparent",
+              border: "0px",
+              borderColor: "transparent",
               boxShadow: "none"
             }}
             _focus={{
-              border: "1px solid transparent",
+              border: "0px",
+              borderColor: "transparent",
               boxShadow: "none"
             }}
-            onChange={onChange}
+            _invalid={{ border: "0px", borderColor: "transparent", boxShadow: "none" }}
+            onChange={(e: any) => {
+              const value = e?.target.value ?? 0;
+              onChange(value);
+            }}
           />
           {/* <NumberInputStepper gap="6px">
         <NumberIncrementStepper
@@ -131,6 +137,7 @@ export const CustomInputNumber: FC<Props> = ({
             lineHeight="150%"
             letterSpacing={"-0.2px"}
             spacing={"4px"}
+            px="10px"
           >
             <Icon as={BiSolidErrorAlt} w="18px" h="18px" px={"3px"} py={"3.5px"} />
             <Text>{error.message}</Text>
