@@ -5,13 +5,11 @@ import {
   Divider,
   Flex,
   Stack,
-  useColorModeValue,
   useDisclosure,
   useToast,
   VStack
 } from "@chakra-ui/react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
 import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
@@ -20,11 +18,9 @@ import roadmapService from "../../../../services/roadmapService";
 import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import NodeModal from "./NodeModal";
+import QuestionModal from "./QuestionModal";
 
 export default function RoadmapList() {
-  const navigate = useNavigate();
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const toast = useToast();
 
   const [specialityList, setSpecialityList] = React.useState([]);
@@ -32,13 +28,22 @@ export default function RoadmapList() {
 
   const [levelSelected, setLevelSelected] = React.useState<number | undefined | null>();
   const [roadmapList, setRoadmapList] = React.useState([]);
+  const [roadmapUpdate, setRoadmapUpdate] = React.useState<any>();
   const [roadmapSelected, setRoadmapSelected] = React.useState<any>();
   const { isOpen: isOpenNode, onOpen: onOpenNode, onClose: onCloseNode } = useDisclosure();
+
+  const [questionUpdate, setQuestionUpdate] = React.useState<any>();
+  const { isOpen: isOpenQuestion, onOpen: onOpenQuestion, onClose: onCloseQuestion } = useDisclosure();
 
   const [questionList, setQuestionList] = React.useState([]);
 
   const [deletingObj, setDeletingObj] = React.useState<any>();
   const { isOpen: isOpenDeleteNode, onOpen: onOpenDeleteNode, onClose: onCloseDeleteNode } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteQuestion,
+    onOpen: onOpenDeleteQuestion,
+    onClose: onCloseDeleteQuestion
+  } = useDisclosure();
 
   const init = async () => {
     const { data: { data: list } = { data: {} } } = await specialityService.getAll();
@@ -61,11 +66,22 @@ export default function RoadmapList() {
 
   const initRoadmapQuestions = async (roadmapId: any) => {
     const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestion(roadmapId);
+    setRoadmapSelected(roadmapId);
     setQuestionList(list.rows);
   };
 
-  const handleEdit = (id: number) => {
-    navigate(`/admin/posts/${id}`);
+  const handleSelectSpeciality = (id: number) => {
+    setSpecialitySelected(specialityList.find((item: any) => item.id === id));
+    setLevelSelected(null);
+    setRoadmapList([]);
+    setQuestionList([]);
+  };
+
+  const handleUnSelectSpeciality = () => {
+    setSpecialitySelected({});
+    setLevelSelected(null);
+    setRoadmapList([]);
+    setQuestionList([]);
   };
 
   const handleAddLevel = async () => {
@@ -104,12 +120,12 @@ export default function RoadmapList() {
   };
 
   const handleAddNode = async () => {
-    setRoadmapSelected({});
+    setRoadmapUpdate({});
     onOpenNode();
   };
 
   const handleUpdateNode = (data: any) => {
-    setRoadmapSelected(data);
+    setRoadmapUpdate(data);
     onOpenNode();
   };
 
@@ -129,20 +145,6 @@ export default function RoadmapList() {
     );
   };
 
-  const handleSelectSpeciality = (id: number) => {
-    setSpecialitySelected(specialityList.find((item: any) => item.id === id));
-    setLevelSelected(null);
-    setRoadmapList([]);
-    setQuestionList([]);
-  };
-
-  const handleUnSelectSpeciality = () => {
-    setSpecialitySelected({});
-    setLevelSelected(null);
-    setRoadmapList([]);
-    setQuestionList([]);
-  };
-
   const handleDeleteNode = async (obj: any) => {
     setDeletingObj(obj);
     onOpenDeleteNode();
@@ -151,6 +153,54 @@ export default function RoadmapList() {
   const confirmDeleteNode = async (id: number) => {
     try {
       const { data: { data: _updated } = { data: {} } } = await roadmapService.delete(id);
+
+      setDeletingObj(null);
+      setRoadmapList(roadmapList.filter((item: any) => item.id !== id));
+      onCloseDeleteNode();
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
+      });
+    }
+  };
+
+  const handleAddQuestion = async () => {
+    setQuestionUpdate({});
+    onOpenQuestion();
+  };
+
+  const handleUpdateQuestion = (data: any) => {
+    setQuestionUpdate(data);
+    onOpenQuestion();
+  };
+
+  const handleQuestionUpdated = async (id: number, data: any) => {
+    if (id === -1) {
+      setQuestionList([...questionList, data]);
+      return;
+    }
+    setQuestionList(
+      questionList.map((item: any) => {
+        if (item.id === id) {
+          return { ...item, ...data };
+        }
+
+        return item;
+      })
+    );
+  };
+
+  const handleDeleteQuestion = async (obj: any) => {
+    setDeletingObj(obj);
+    onOpenDeleteQuestion();
+  };
+
+  const confirmDeleteQuestion = async (id: number) => {
+    try {
+      const { data: { data: _updated } = { data: {} } } = await roadmapService.deleteQuestion(roadmapSelected, id);
 
       setDeletingObj(null);
       setRoadmapList(roadmapList.filter((item: any) => item.id !== id));
@@ -243,7 +293,7 @@ export default function RoadmapList() {
           <Divider orientation="vertical" />
         </Box>
         <VStack w="full" spacing={"12px"} align="flex-start" pr={"25px"}>
-          <Button w="full" border={"dashed"}>
+          <Button w="full" border={"dashed"} onClick={handleAddQuestion}>
             {"Thêm câu hỏi"}
           </Button>
           <Box w="full" maxH="680px" overflowY={"scroll"}>
@@ -258,15 +308,15 @@ export default function RoadmapList() {
                     w="15px"
                     h="15px"
                     cursor={"pointer"}
-                    onClick={() => handleEdit(item.id)}
+                    onClick={() => handleUpdateQuestion(item)}
                   />
-                  {/* <DeleteIcon
+                  <DeleteIcon
                     color="red.500"
                     w="15px"
                     h="15px"
                     cursor={"pointer"}
-                    onClick={() => handleDelete(item.id)}
-                  /> */}
+                    onClick={() => handleDeleteQuestion(item)}
+                  />
                 </Flex>
               ))}
             </VStack>
@@ -277,9 +327,17 @@ export default function RoadmapList() {
         <NodeModal
           speciality={specialitySelected}
           levelId={levelSelected}
-          data={roadmapSelected}
+          data={roadmapUpdate}
           onUpdate={handleUpdateRoadmap}
           onClose={onCloseNode}
+        />
+      )}
+      {isOpenQuestion && (
+        <QuestionModal
+          roadmapId={roadmapSelected}
+          data={questionUpdate}
+          onUpdate={handleQuestionUpdated}
+          onClose={onCloseQuestion}
         />
       )}
       {isOpenDeleteNode && deletingObj && (
@@ -290,6 +348,16 @@ export default function RoadmapList() {
           confirmText={"Confirm"}
           onClose={onCloseDeleteNode}
           onConfirm={() => confirmDeleteNode(deletingObj.id)}
+        />
+      )}
+      {isOpenDeleteQuestion && deletingObj && (
+        <CustomConfirmAlert
+          title={`Remove ${deletingObj.title}`}
+          question={"Are you sure to remove this Question?"}
+          cancelText={"Cancel"}
+          confirmText={"Confirm"}
+          onClose={onCloseDeleteQuestion}
+          onConfirm={() => confirmDeleteQuestion(deletingObj.id)}
         />
       )}
     </CustomCard>

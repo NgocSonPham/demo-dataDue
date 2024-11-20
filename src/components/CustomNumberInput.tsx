@@ -4,11 +4,8 @@ import {
   FormErrorMessage,
   HStack,
   Icon,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
-  NumberInputStepper,
   Text,
   VStack
 } from "@chakra-ui/react";

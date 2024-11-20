@@ -21,7 +21,19 @@ const roadmapService = {
   },
   delete: function (id: number) {
     return dataServiceAxios.delete(`core/roadmaps/${id}`);
-  }
+  },
+  createQuestion: function (id: number, data: any) {
+    return dataServiceAxios.post(`core/roadmaps/${id}/questions`, data);
+  },
+  getByQuestionId: function (id: number, questionId: number) {
+    return dataServiceAxios.get(`core/roadmaps/${id}/questions/${questionId}`);
+  },
+  updateQuestion: function (id: number | string, questionId: number, data: any) {
+    return dataServiceAxios.patch(`core/roadmaps/${id}/questions/${questionId}`, data);
+  },
+  deleteQuestion: function (id: number, questionId: number) {
+    return dataServiceAxios.delete(`core/roadmaps/${id}/questions/${questionId}`);
+  },
 };
 
 export default roadmapService;

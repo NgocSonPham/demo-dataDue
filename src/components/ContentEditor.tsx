@@ -122,7 +122,15 @@ function debounce(func: any, wait: number) {
   };
 }
 
-function HtmlEditor({ content, onChange }: { content: string; onChange: (value: string) => void }) {
+function ContentEditor({
+  content,
+  type,
+  onChange
+}: {
+  content: string;
+  type: "text" | "html" | "json";
+  onChange: (value: string) => void;
+}) {
   locale.setLang("vi");
 
   const onValueChange = useCallback(
@@ -134,7 +142,7 @@ function HtmlEditor({ content, onChange }: { content: string; onChange: (value: 
 
   return (
     <RichTextEditor
-      output="html"
+      output={type}
       content={content as any}
       onChangeContent={onValueChange}
       extensions={extensions}
@@ -143,4 +151,4 @@ function HtmlEditor({ content, onChange }: { content: string; onChange: (value: 
   );
 }
 
-export default HtmlEditor;
+export default ContentEditor;

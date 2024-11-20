@@ -24,7 +24,7 @@ import mainCategoryService from "../../../../services/mainCategoryService";
 import postService from "../../../../services/postService";
 import subCategoryService from "../../../../services/subCategoryService";
 import { getErrorMessage } from "../../../../utils/helpers";
-import HtmlEditor from "../../../../components/HtmlEditor";
+import ContentEditor from "../../../../components/ContentEditor";
 
 type FormType = {
   id?: string;
@@ -296,7 +296,7 @@ export default function PostDetail() {
           name="content"
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <FormControl isInvalid={!!error} id="tags">
-              <HtmlEditor content={value} onChange={onChange} />
+              <ContentEditor type={"html"} content={value} onChange={onChange} />
 
               {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
             </FormControl>
