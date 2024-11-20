@@ -28,7 +28,7 @@ import { CustomInputNumber } from "../../../../components/CustomNumberInput";
 import CustomSelect from "../../../../components/CustomSelect";
 import roadmapService from "../../../../services/roadmapService";
 import { getErrorMessage } from "../../../../utils/helpers";
-import { countBoldItalicTexts } from "./countAnswers";
+import { countBoldItalicTexts } from "./CountAnswers";
 
 type FormType = {
   id?: number;
@@ -93,13 +93,12 @@ export default function QuestionModal({
   });
 
   const onChangeAnswerChoices = (value: string[], index: number) => {
-    // update answerChoices at index with value
     setValue("answerChoices", {
       ...answerChoices,
       [index]: value
     });
   };
-  console.log("answerChoices", answerChoices);
+
   const save: SubmitHandler<FormType> = async (data) => {
     mutate(data);
   };
