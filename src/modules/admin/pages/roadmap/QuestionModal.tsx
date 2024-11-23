@@ -266,6 +266,7 @@ export default function QuestionModal({
                     <ListOfChoices
                       choices={answerChoices ?? []}
                       rightChoices={[]}
+                      disableChooseRightChoices={true}
                       haveArrangement={true}
                       onUpdateChoices={(choices) => setValue("answerChoices", choices)}
                       onUpdateRightChoices={() => {}}
@@ -316,6 +317,7 @@ export default function QuestionModal({
                     choices={answerChoices ?? []}
                     rightChoices={answer ?? []}
                     haveArrangement={true}
+                    isMultiChoices={true}
                     onUpdateChoices={(choices) => setValue("answerChoices", choices)}
                     onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
                   />

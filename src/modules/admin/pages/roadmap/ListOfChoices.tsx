@@ -18,12 +18,14 @@ type FormType = {
 export default function ListOfChoices({
   choices,
   rightChoices,
+  disableChooseRightChoices = false,
   haveArrangement = false,
   isMultiChoices = false,
   onUpdateChoices,
   onUpdateRightChoices
 }: {
   choices: Choice[];
+  disableChooseRightChoices?: boolean;
   rightChoices: string[];
   haveArrangement?: boolean;
   isMultiChoices?: boolean;
@@ -33,7 +35,7 @@ export default function ListOfChoices({
   const derivedChoices = choices.map((choice, idx) => ({
     ...choice,
     isRight: rightChoices.includes(choice.name),
-    id: haveArrangement ? idx + 1 : undefined
+    id: idx + 1
   }));
   const { control, setValue, watch } = useForm<FormType>({ defaultValues: { choices: derivedChoices } });
 
@@ -48,8 +50,8 @@ export default function ListOfChoices({
     setValue("choices", [...currentChoices, newChoice]);
   };
 
-  const deleteChoice = (index: number) => {
-    const updatedChoices = currentChoices.filter((_, i) => i !== index);
+  const deleteChoice = (id: number) => {
+    const updatedChoices = currentChoices.filter((choice, i) => choice.id !== id);
     setValue("choices", updatedChoices);
   };
 
@@ -60,12 +62,12 @@ export default function ListOfChoices({
     onUpdateChoices(updatedChoices);
   };
 
-  const handleIsRightChange = (index: number) => {
+  const handleIsRightChange = (id: number) => {
     const updatedChoices = isMultiChoices
-      ? currentChoices.map((choice, i) => (i === index ? { ...choice, isRight: !choice.isRight } : choice))
+      ? currentChoices.map((choice, i) => (choice.id === id ? { ...choice, isRight: !choice.isRight } : choice))
       : currentChoices.map((choice, i) => ({
           ...choice,
-          isRight: i === index
+          isRight: choice.id === id
         }));
     setValue("choices", updatedChoices);
     onUpdateRightChoices(updatedChoices.filter((choice) => choice.isRight).map((choice) => choice.name));
@@ -106,7 +108,7 @@ export default function ListOfChoices({
                     cursor={"pointer"}
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteChoice(index);
+                      deleteChoice(choice.id);
                     }}
                     onPointerDown={(e) => e.stopPropagation()}
                   />
@@ -123,6 +125,16 @@ export default function ListOfChoices({
                       />
                     )}
                   />
+                  {!disableChooseRightChoices && (
+                    <Checkbox
+                      w="200px"
+                      isChecked={choice.isRight}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onChange={() => handleIsRightChange(choice.id)}
+                    >
+                      {"Câu trả lời đúng"}
+                    </Checkbox>
+                  )}
                   <Box cursor="grab">
                     <DragHandleIcon />
                   </Box>
@@ -134,7 +146,7 @@ export default function ListOfChoices({
       ) : (
         currentChoices.map((choice, index) => (
           <Box w="full" key={index} display="flex" alignItems="center" gap={4}>
-            <DeleteIcon color="red.500" w="15px" h="15px" cursor={"pointer"} onClick={() => deleteChoice(index)} />
+            <DeleteIcon color="red.500" w="15px" h="15px" cursor={"pointer"} onClick={() => deleteChoice(choice.id)} />
             <Controller
               name={`choices.${index}.name`}
               control={control}
@@ -146,7 +158,7 @@ export default function ListOfChoices({
                 />
               )}
             />
-            <Checkbox w="200px" isChecked={choice.isRight} onChange={() => handleIsRightChange(index)}>
+            <Checkbox w="200px" isChecked={choice.isRight} onChange={() => handleIsRightChange(choice.id)}>
               {"Câu trả lời đúng"}
             </Checkbox>
           </Box>
