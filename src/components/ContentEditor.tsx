@@ -97,7 +97,10 @@ const extensions = [
   Code.configure({
     toolbar: false
   }),
-  CodeBlock.configure({ defaultTheme: "dracula" }),
+   CodeBlock.configure({
+    defaultTheme: 'dracula',
+    languages: ['dax', 'sql', 'python', 'bash', 'csv', 'tsv', 'json', 'xml', 'yaml', 'mdx', 'nginx']
+  }),
   ColumnActionButton,
   Table,
   ImportWord.configure({
