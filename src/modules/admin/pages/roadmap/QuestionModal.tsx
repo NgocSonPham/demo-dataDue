@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Button,
   Flex,
@@ -29,6 +27,7 @@ import CustomSelect from "../../../../components/CustomSelect";
 import roadmapService from "../../../../services/roadmapService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import { countBoldItalicTexts } from "./CountAnswers";
+import ListOfChoices from "./ListOfChoices";
 
 type FormType = {
   id?: number;
@@ -242,6 +241,84 @@ export default function QuestionModal({
                       </Flex>
                     ))}
                   </VStack>
+                </VStack>
+              )}
+
+              {questionType === "snippet" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>{"Mô tả câu trả lời"}</Text>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Đáp án"}</Text>
+                    <Controller
+                      control={control}
+                      name="answer"
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <FormControl isInvalid={!!error} id="answer">
+                          <ContentEditor type={"json"} content={value} onChange={onChange} />
+
+                          {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                        </FormControl>
+                      )}
+                    />
+                  </VStack>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Danh sách lựa chọn"}</Text>
+                    <ListOfChoices
+                      choices={answerChoices ?? []}
+                      rightChoices={[]}
+                      haveArrangement={true}
+                      onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                      onUpdateRightChoices={() => {}}
+                    />
+                  </VStack>
+                </VStack>
+              )}
+
+              {questionType === "multi-choices" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>{"Danh sách câu trả lời"}</Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    isMultiChoices={true}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
+                </VStack>
+              )}
+
+              {questionType === "single-choice" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>
+                    {"Danh sách câu trả lời"}
+                    <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
+                      {"(Chỉ chọn 1 câu trả lời đúng)"}
+                    </Text>
+                  </Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
+                </VStack>
+              )}
+
+              {questionType === "drag-drop" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>
+                    {"Danh sách câu trả lời"}
+                    <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
+                      {"(Kéo thả để sắp xếp thứ tự đúng)"}
+                    </Text>
+                  </Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    haveArrangement={true}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
                 </VStack>
               )}
             </VStack>
