@@ -99,7 +99,7 @@ const extensions = [
   }),
    CodeBlock.configure({
     defaultTheme: 'dracula',
-    languages: ['dax', 'sql', 'python', 'bash', 'csv', 'tsv', 'json', 'xml', 'yaml', 'mdx', 'nginx']
+    languages: ['DAX', 'SQL', 'Python', 'Bash', 'CSV', 'TSV', 'JSON', 'XML', 'YAML', 'MDX', 'Nginx']
   }),
   ColumnActionButton,
   Table,
