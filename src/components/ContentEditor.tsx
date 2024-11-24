@@ -98,7 +98,7 @@ const extensions = [
     toolbar: false
   }),
    CodeBlock.configure({
-    defaultTheme: 'github-light',
+    defaultTheme: 'dracula',
     languages: ['dax', 'sql', 'python', 'bash', 'csv', 'tsv', 'json', 'xml', 'yaml', 'mdx', 'nginx']
   }),
   ColumnActionButton,
