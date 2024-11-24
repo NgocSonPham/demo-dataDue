@@ -99,7 +99,7 @@ const extensions = [
   }),
    CodeBlock.configure({
     defaultTheme: 'github-light',
-    languages: ['DAX', 'SQL', 'Python', 'Bash', 'CSV', 'TSV', 'JSON', 'XML', 'YAML', 'MDX', 'Nginx']
+    languages: ['dax', 'sql', 'python', 'bash', 'csv', 'tsv', 'json', 'xml', 'yaml', 'mdx', 'nginx']
   }),
   ColumnActionButton,
   Table,
