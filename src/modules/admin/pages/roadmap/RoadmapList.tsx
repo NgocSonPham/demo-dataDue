@@ -24,9 +24,6 @@ export default function RoadmapList() {
   const [roadmapSelected, setRoadmapSelected] = React.useState<any>();
   const { isOpen: isOpenNode, onOpen: onOpenNode, onClose: onCloseNode } = useDisclosure();
 
-  const [questionUpdate, setQuestionUpdate] = React.useState<any>();
-  const { isOpen: isOpenQuestion, onOpen: onOpenQuestion, onClose: onCloseQuestion } = useDisclosure();
-
   const [questionList, setQuestionList] = React.useState([]);
 
   const [deletingObj, setDeletingObj] = React.useState<any>();
@@ -157,32 +154,6 @@ export default function RoadmapList() {
         render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
       });
     }
-  };
-
-  const handleAddQuestion = async () => {
-    setQuestionUpdate({});
-    onOpenQuestion();
-  };
-
-  const handleUpdateQuestion = (data: any) => {
-    setQuestionUpdate(data);
-    onOpenQuestion();
-  };
-
-  const handleQuestionUpdated = async (id: number, data: any) => {
-    if (id === -1) {
-      setQuestionList([...questionList, data]);
-      return;
-    }
-    setQuestionList(
-      questionList.map((item: any) => {
-        if (item.id === id) {
-          return { ...item, ...data };
-        }
-
-        return item;
-      })
-    );
   };
 
   const handleDeleteQuestion = async (obj: any) => {
@@ -332,14 +303,6 @@ export default function RoadmapList() {
           onClose={onCloseNode}
         />
       )}
-      {/* {isOpenQuestion && (
-        <QuestionModal
-          roadmapId={roadmapSelected}
-          data={questionUpdate}
-          onUpdate={handleQuestionUpdated}
-          onClose={onCloseQuestion}
-        />
-      )} */}
       {isOpenDeleteNode && deletingObj && (
         <CustomConfirmAlert
           title={`Remove ${deletingObj.name}`}

@@ -1,3 +1,4 @@
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Button,
   Flex,
@@ -5,23 +6,18 @@ import {
   FormErrorMessage,
   Heading,
   HStack,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Portal,
   Text,
   useToast,
   VStack
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
+import { useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import ContentEditor from "../../../../components/ContentEditor";
+import CustomCard from "../../../../components/CustomCard";
 import CustomInput from "../../../../components/CustomInput";
 import { CustomInputNumber } from "../../../../components/CustomNumberInput";
 import CustomSelect from "../../../../components/CustomSelect";
@@ -29,10 +25,6 @@ import roadmapService from "../../../../services/roadmapService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import { countBoldItalicTexts } from "./CountAnswers";
 import ListOfChoices from "./ListOfChoices";
-import { useNavigate, useParams } from "react-router-dom";
-import CustomCard from "../../../../components/CustomCard";
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
 
 type FormType = {
   id?: number;
@@ -63,14 +55,14 @@ export default function RoadmapQuestion() {
   const answerChoices = watch("answerChoices");
 
   useEffect(() => {
-    if (!isEmpty(id)) return navigate(-1);
+    if (isEmpty(id)) return navigate(-1);
     if (questionId !== "new") {
       roadmapService.getByQuestionId(id, questionId).then((res) => {
         const { data: { data: questionData = { data: {} } } = { data: {} } } = res;
         reset(questionData);
       });
     }
-  }, [questionId]);
+  }, [id, questionId]);
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (dataUpdate: any) => {
