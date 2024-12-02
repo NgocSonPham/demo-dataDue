@@ -16,6 +16,7 @@ import TrainingOrganizationList from "./pages/training-organization/TrainingOrga
 import UserList from "./pages/user/UserList";
 import PostDetail from "./pages/post/PostDetail";
 import RoadmapList from "./pages/roadmap/RoadmapList";
+import RoadmapQuestion from "./pages/roadmap/RoadmapQuestion";
 
 const routes: RoutesType[] = [
   {
@@ -122,6 +123,14 @@ const routes: RoutesType[] = [
     component: <RoadmapList />,
     level: 0,
     sidebar: true
+  },
+  {
+    name: "Cập nhật Roadmap Question",
+    path: "/roadmaps/:id/questions/:questionId",
+    resource: "roadmaps",
+    component: <RoadmapQuestion />,
+    level: 0,
+    sidebar: false
   },
   {
     name: "Danh sách Người dùng",

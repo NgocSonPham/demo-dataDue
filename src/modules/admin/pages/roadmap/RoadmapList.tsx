@@ -1,15 +1,7 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Stack,
-  useDisclosure,
-  useToast,
-  VStack
-} from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
 import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
@@ -18,10 +10,10 @@ import roadmapService from "../../../../services/roadmapService";
 import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import NodeModal from "./NodeModal";
-import QuestionModal from "./QuestionModal";
 
 export default function RoadmapList() {
   const toast = useToast();
+  const navigate = useNavigate();
 
   const [specialityList, setSpecialityList] = React.useState([]);
   const [specialitySelected, setSpecialitySelected] = React.useState<any>();
@@ -293,7 +285,13 @@ export default function RoadmapList() {
           <Divider orientation="vertical" />
         </Box>
         <VStack w="full" spacing={"12px"} align="flex-start" pr={"25px"}>
-          <Button w="full" border={"dashed"} onClick={handleAddQuestion}>
+          <Button
+            w="full"
+            border={"dashed"}
+            onClick={() => {
+              navigate(`/admin/roadmaps/${roadmapSelected}/questions/new`);
+            }}
+          >
             {"Thêm câu hỏi"}
           </Button>
           <Box w="full" maxH="680px" overflowY={"scroll"}>
@@ -308,7 +306,9 @@ export default function RoadmapList() {
                     w="15px"
                     h="15px"
                     cursor={"pointer"}
-                    onClick={() => handleUpdateQuestion(item)}
+                    onClick={() => {
+                      navigate(`/admin/roadmaps/${roadmapSelected}/questions/${item.id}`);
+                    }}
                   />
                   <DeleteIcon
                     color="red.500"
@@ -332,14 +332,14 @@ export default function RoadmapList() {
           onClose={onCloseNode}
         />
       )}
-      {isOpenQuestion && (
+      {/* {isOpenQuestion && (
         <QuestionModal
           roadmapId={roadmapSelected}
           data={questionUpdate}
           onUpdate={handleQuestionUpdated}
           onClose={onCloseQuestion}
         />
-      )}
+      )} */}
       {isOpenDeleteNode && deletingObj && (
         <CustomConfirmAlert
           title={`Remove ${deletingObj.name}`}

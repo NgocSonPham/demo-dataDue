@@ -4,6 +4,7 @@ import { closestCenter, DndContext } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Controller, useForm } from "react-hook-form";
 import { SortableItem } from "./SortableItem";
+import { useEffect } from "react";
 
 type Choice = {
   name: string;
@@ -34,10 +35,21 @@ export default function ListOfChoices({
 }) {
   const derivedChoices = choices.map((choice, idx) => ({
     ...choice,
-    isRight: rightChoices.includes(choice.name),
+    isRight: rightChoices?.includes(choice.name),
     id: idx + 1
   }));
-  const { control, setValue, watch } = useForm<FormType>({ defaultValues: { choices: derivedChoices } });
+
+  useEffect(() => {
+    reset({
+      choices: choices.map((choice, idx) => ({
+        ...choice,
+        isRight: rightChoices?.includes(choice.name),
+        id: idx + 1
+      }))
+    });
+  }, [choices, rightChoices]);
+
+  const { control, setValue, watch, reset } = useForm<FormType>({ defaultValues: { choices: derivedChoices } });
 
   const currentChoices = watch("choices");
 
@@ -85,7 +97,11 @@ export default function ListOfChoices({
       }));
 
       setValue("choices", updatedChoices);
-      onUpdateRightChoices(updatedChoices.map((choice) => choice.name));
+      onUpdateRightChoices(
+        disableChooseRightChoices
+          ? updatedChoices
+          : updatedChoices.filter((choice) => choice.isRight).map((choice) => choice.name)
+      );
       onUpdateChoices(updatedChoices);
     }
   };
