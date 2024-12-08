@@ -10,6 +10,7 @@ import roadmapService from "../../../../services/roadmapService";
 import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import NodeModal from "./NodeModal";
+import LevelModal from "./LevelModal";
 
 export default function RoadmapList() {
   const toast = useToast();
@@ -18,7 +19,9 @@ export default function RoadmapList() {
   const [specialityList, setSpecialityList] = React.useState([]);
   const [specialitySelected, setSpecialitySelected] = React.useState<any>();
 
-  const [levelSelected, setLevelSelected] = React.useState<number | undefined | null>();
+  const [levelSelected, setLevelSelected] = React.useState<any>();
+  const { isOpen: isOpenLevel, onOpen: onOpenLevel, onClose: onCloseLevel } = useDisclosure();
+
   const [roadmapList, setRoadmapList] = React.useState([]);
   const [roadmapUpdate, setRoadmapUpdate] = React.useState<any>();
   const [roadmapSelected, setRoadmapSelected] = React.useState<any>();
@@ -43,12 +46,17 @@ export default function RoadmapList() {
     init();
   }, []);
 
-  const initRoadmap = async (levelId: number) => {
+  const initSpeciality = async (id: number) => {
+    const { data: { data } = { data: {} } } = await specialityService.getById(id);
+    setSpecialitySelected(data);
+  }
+
+  const initRoadmap = async (level: any) => {
     const { data: { data: list } = { data: {} } } = await roadmapService.getAll({
       specialityId: specialitySelected.id,
-      levelId
+      levelId: level.id
     });
-    setLevelSelected(levelId);
+    setLevelSelected(level);
     setRoadmapList(list.rows);
     setQuestionList([]);
   };
@@ -60,7 +68,8 @@ export default function RoadmapList() {
   };
 
   const handleSelectSpeciality = (id: number) => {
-    setSpecialitySelected(specialityList.find((item: any) => item.id === id));
+    if (isNaN(id)) return;
+    initSpeciality(id);
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
@@ -74,28 +83,34 @@ export default function RoadmapList() {
   };
 
   const handleAddLevel = async () => {
-    try {
-      const { data: { data: updated } = { data: {} } } = await specialityService.increaseLevel(specialitySelected.id);
-
-      setSpecialitySelected(updated);
-      setLevelSelected(updated.numOfLevel);
-    } catch (error) {
-      const message = getErrorMessage(error);
-
-      toast({
-        position: "top-right",
-        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
-      });
-    }
+    setLevelSelected({});
+    onOpenLevel();
   };
 
-  const handleDeleteLevel = async (levelId: number) => {
+  const handleUpdateLevel = async (level: any) => {
+    setLevelSelected(level);
+    onOpenLevel();
+  };
+
+  const handleUpdateLevelFinal = async (speciality: any) => {
+    setSpecialitySelected(speciality);
+  };
+
+  const handleDeleteLevel = async (level: any) => {
     try {
+      const hasLevel = specialitySelected.levels.some((item: any) => item.idx > level.idx);
+      if (hasLevel) {
+        toast({
+          position: "top-right",
+          render: ({ onClose }) => <AppToast status={"error"} subtitle={"Vui lòng xoá theo thứ tự"} onClose={onClose} />
+        });
+        return;
+      }
+
       const { data: { data: updated } = { data: {} } } = await specialityService.deleteLevel(
         specialitySelected.id,
-        levelId
+        level.id
       );
-
       setSpecialitySelected(updated);
       setLevelSelected(null);
     } catch (error) {
@@ -201,17 +216,24 @@ export default function RoadmapList() {
             <Button w="full" border={"dashed"} onClick={handleAddLevel}>
               {"Thêm level"}
             </Button>
-            {Array.from({ length: specialitySelected?.numOfLevel ?? 0 }, (_, index) => (
-              <Flex key={index} w="full" align="center" gap="10px">
-                <Button variant={"brand"} w="full" bg={"brand.900"} onClick={() => initRoadmap(index + 1)}>
-                  Level {index + 1}
+            {specialitySelected?.levels?.map((item: any) => (
+              <Flex key={item.id} w="full" align="center" gap="10px">
+                <Button variant={"brand"} w="full" bg={"brand.900"} onClick={() => initRoadmap(item)}>
+                  {item.name}
                 </Button>
+                <EditIcon
+                  color="brand.600"
+                  w="15px"
+                  h="15px"
+                  cursor={"pointer"}
+                  onClick={() => handleUpdateLevel(item)}
+                />
                 <DeleteIcon
                   color="red.500"
                   w="15px"
                   h="15px"
                   cursor={"pointer"}
-                  onClick={() => handleDeleteLevel(index + 1)}
+                  onClick={() => handleDeleteLevel(item)}
                 />
               </Flex>
             ))}
@@ -294,10 +316,18 @@ export default function RoadmapList() {
           </Box>
         </VStack>
       </Stack>
+      {isOpenLevel && (
+        <LevelModal
+          speciality={specialitySelected}
+          data={levelSelected}
+          onUpdate={handleUpdateLevelFinal}
+          onClose={onCloseLevel}
+        />
+      )}
       {isOpenNode && (
         <NodeModal
           speciality={specialitySelected}
-          levelId={levelSelected}
+          levelId={levelSelected.id}
           data={roadmapUpdate}
           onUpdate={handleUpdateRoadmap}
           onClose={onCloseNode}

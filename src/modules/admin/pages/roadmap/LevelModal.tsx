@@ -2,8 +2,6 @@
 
 import {
   Button,
-  FormControl,
-  FormErrorMessage,
   HStack,
   Modal,
   ModalBody,
@@ -23,47 +21,48 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import AppToast from "../../../../components/AppToast";
 import CustomInput from "../../../../components/CustomInput";
 import { CustomInputNumber } from "../../../../components/CustomNumberInput";
-import CustomSelect from "../../../../components/CustomSelect";
 import CustomUploadButton from "../../../../components/CustomUploadButton";
-import roadmapService from "../../../../services/roadmapService";
+import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
 
 type FormType = {
   id?: number;
   name: string;
   specialityId: number;
-  levelId: number;
-  type: string;
-  icon?: string;
   idx: number;
+  thumbnail?: string;
+  header?: string;
 };
 
-export default function NodeModal({
+export default function LevelModal({
   speciality,
-  levelId,
   data,
   onUpdate,
   onClose
 }: {
   speciality: any;
-  levelId: number;
   data: any;
-  onUpdate: (id: number, data: any) => void;
+  onUpdate: (data: any) => void;
   onClose: () => void;
 }) {
   const toast = useToast();
-  const defaultValues = data;
+  const defaultValues = {
+    ...data,
+    name: data?.name ?? `Level ${speciality.levels.length + 1}`,
+    idx: data?.idx ?? speciality.levels.length + 1,
+  };
 
   const { control, setValue, watch, handleSubmit: onSubmit } = useForm<FormType>({ defaultValues });
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (dataUpdate: any) => {
-      const obj = { ...dataUpdate, specialityId: speciality.id, levelId };
-      return isEmpty(data) ? roadmapService.create(obj) : roadmapService.update(data.id, obj);
+      return isEmpty(data)
+        ? specialityService.createLevel(speciality.id, dataUpdate)
+        : specialityService.updateLevel(speciality.id, data.id, dataUpdate);
     },
     onSuccess: async (res: any) => {
       const { data: { data: updatedData } = { data: {} } } = res;
-      onUpdate(isEmpty(data) ? -1 : data.id, updatedData);
+      onUpdate(updatedData);
 
       toast({
         description: "Lưu thành công!",
@@ -90,8 +89,8 @@ export default function NodeModal({
   };
 
   const handleUpload = async (name: string, file: string | string[]) => {
-    if (name === "icon") {
-      setValue("icon", typeof file === "object" ? file[0] : (file as string));
+    if (name === "thumbnail" || name === "header") {
+      setValue(name, typeof file === "object" ? file[0] : (file as string));
       return;
     }
   };
@@ -117,8 +116,9 @@ export default function NodeModal({
                 rules={{ required: "Tên không được để trống" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <CustomInput
-                    label="Tên node"
+                    label="Tên level"
                     isRequired
+                    disabled={true}
                     value={value}
                     error={error}
                     onTextChange={(value) => onChange(value)}
@@ -128,47 +128,26 @@ export default function NodeModal({
               <CustomUploadButton
                 bg={"secondaryGray.300"}
                 h="100px"
-                label="Add icon"
+                label="Add thumbnail"
                 onUploadChange={handleUpload}
-                name={`icon`}
-                src={watch("icon") ?? ""}
+                name={`thumbnail`}
+                src={watch("thumbnail") ?? ""}
                 thumbnail
                 rounded="8px"
                 w="120px"
                 minW="120px"
               />
-              <Controller
-                control={control}
-                name="type"
-                rules={{ required: "Loại không được để trống" }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <FormControl isInvalid={!!error}>
-                    <CustomSelect
-                      w="full"
-                      placeholder="Chọn loại.."
-                      allowAddNew={false}
-                      name={"type"}
-                      value={[value]}
-                      options={[
-                        {
-                          label: "Thông thường",
-                          value: "common-test"
-                        },
-                        {
-                          label: "Luyện tập",
-                          value: "practice"
-                        },
-                        {
-                          label: "Final test",
-                          value: "final-test"
-                        }
-                      ]}
-                      onSelected={(value) => onChange(value[0])}
-                    />
-
-                    {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-                  </FormControl>
-                )}
+              <CustomUploadButton
+                bg={"secondaryGray.300"}
+                h="100px"
+                label="Add header"
+                onUploadChange={handleUpload}
+                name={`header`}
+                src={watch("header") ?? ""}
+                thumbnail
+                rounded="8px"
+                w="120px"
+                minW="120px"
               />
               <Controller
                 name="idx"
@@ -178,6 +157,7 @@ export default function NodeModal({
                   <CustomInputNumber
                     label="Thứ tự"
                     isRequired
+                    disabled={true}
                     value={value}
                     error={error}
                     onChange={(value) => onChange(value)}
