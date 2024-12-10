@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import RichTextEditor, {
   BaseKit,
@@ -134,6 +134,7 @@ function ContentEditor({
   type: "text" | "html" | "json";
   onChange: (value: string) => void;
 }) {
+  const editorRef = useRef<any>(null);
   locale.setLang("vi");
 
   const onValueChange = useCallback(
@@ -143,8 +144,19 @@ function ContentEditor({
     []
   );
 
+  useEffect(() => {
+    // Update editor content if `content` prop changes
+    if (editorRef.current) {
+      const currentContent = editorRef.current.editor.getHTML(); // Or appropriate method based on type
+      if (currentContent !== content) {
+        editorRef.current.editor.commands.setContent(content); // Set new content
+      }
+    }
+  }, [content]);
+
   return (
     <RichTextEditor
+      ref={editorRef}
       output={type}
       content={content as any}
       onChangeContent={onValueChange}

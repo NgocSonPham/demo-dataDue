@@ -1,15 +1,5 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Heading,
-  HStack,
-  Text,
-  useToast,
-  VStack
-} from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormErrorMessage, Heading, HStack, Text, useToast, VStack } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
@@ -25,6 +15,7 @@ import roadmapService from "../../../../services/roadmapService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import { countBoldItalicTexts } from "./CountAnswers";
 import ListOfChoices from "./ListOfChoices";
+import SanboxOfQuestion from "./SanboxOfQuestion";
 
 type FormType = {
   id?: number;
@@ -34,7 +25,7 @@ type FormType = {
   description: string;
   answer: any;
   answerChoices: any;
-  sanbox?: string;
+  sandbox?: any;
   hint?: string;
   guide?: string;
 };
@@ -101,7 +92,6 @@ export default function RoadmapQuestion() {
   const save: SubmitHandler<FormType> = async (data) => {
     mutate(data);
   };
-  
   return (
     <CustomCard flexDirection="column" w="100%" minH="83vh" px="20px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <HStack w="full" spacing={4} mb={"20px"}>
@@ -256,7 +246,11 @@ export default function RoadmapQuestion() {
 
         {questionType === "snippet" && (
           <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>{"Mô tả câu trả lời"}</Text>
+            <Text fontWeight={"bold"}>{"Sandbox"}</Text>
+            <SanboxOfQuestion sandbox={watch("sandbox") ?? []} onUpdateSanbox={(data) => setValue("sandbox", data)} />
+            <Text fontWeight={"bold"} pt="20px">
+              {"Mô tả câu trả lời"}
+            </Text>
             <VStack w="full" align="flex-start" spacing={1}>
               <Text>{"Đáp án"}</Text>
               <Controller
