@@ -8,7 +8,7 @@ export const CONVERSATION_STATUS = {
 
 export const USER_ROLE = {
   ADMIN: "admin",
-  CREATOR: "creator",
+  COLLABORATOR: "collaborator",
   GUEST: "guest",
 };
 

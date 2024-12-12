@@ -1,16 +1,4 @@
-import {
-  Button,
-  Center,
-  Flex,
-  HStack,
-  Heading,
-  Icon,
-  Image,
-  Link,
-  Stack,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Center, Flex, HStack, Heading, Icon, Image, Link, Stack, Text, useToast } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import React from "react";
@@ -59,10 +47,14 @@ export const SignUp = () => {
     email: "",
     username: "",
     password: "",
-    confirmPassword: "",
+    confirmPassword: ""
   };
-  const { control, handleSubmit: onSubmit, watch } = useForm<FormType>({
-    defaultValues,
+  const {
+    control,
+    handleSubmit: onSubmit,
+    watch
+  } = useForm<FormType>({
+    defaultValues
   });
 
   const { mutate, isLoading } = useMutation({
@@ -73,21 +65,15 @@ export const SignUp = () => {
       const { data: { data: user } = { data: {} } } = data;
       dispatch(setUser(user));
 
-      [USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)
-        ? navigate("/admin")
-        : navigate("/");
+      [USER_ROLE.ADMIN, USER_ROLE.COLLABORATOR].includes(user.roleId) ? navigate("/admin") : navigate("/");
 
       toast({
         position: "top-right",
         render: ({ onClose }) => (
-          <AppToast
-            title={"SUCCESS"}
-            subtitle={`Chào mừng ${userFullnameOrUsername(user)}!`}
-            onClose={onClose}
-          />
-        ),
+          <AppToast title={"SUCCESS"} subtitle={`Chào mừng ${userFullnameOrUsername(user)}!`} onClose={onClose} />
+        )
       });
-    },
+    }
   });
 
   const handleSubmit: SubmitHandler<FormType> = (data) => {
@@ -96,15 +82,7 @@ export const SignUp = () => {
 
   return (
     <Center w="100vw" h="100vh" bg={"gray.50"}>
-      <Stack
-        rounded={"lg"}
-        bg={"white"}
-        boxShadow={"lg"}
-        px={"40px"}
-        py={"32px"}
-        spacing={"20px"}
-        maxW="500px"
-      >
+      <Stack rounded={"lg"} bg={"white"} boxShadow={"lg"} px={"40px"} py={"32px"} spacing={"20px"} maxW="500px">
         <HStack align={"center"} justify={"center"} spacing="10px">
           <Image src={"/logo.svg"} w="40px" h="40px" />
           <Text fontSize="2xl" fontWeight={600} color={"navy.700"}>
@@ -135,7 +113,7 @@ export const SignUp = () => {
             name="email"
             control={control}
             rules={{
-              required: "Email không được để trống",
+              required: "Email không được để trống"
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CustomInput
@@ -156,7 +134,7 @@ export const SignUp = () => {
             name="username"
             control={control}
             rules={{
-              required: "Tên người dùng không được để trống",
+              required: "Tên người dùng không được để trống"
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CustomInput
@@ -206,8 +184,7 @@ export const SignUp = () => {
             control={control}
             rules={{
               required: "Xác nhận mật khẩu không được để trống",
-              validate: (value) =>
-                value === watch("password") || "Mật khẩu xác nhận không trùng khớp",
+              validate: (value) => value === watch("password") || "Mật khẩu xác nhận không trùng khớp"
             }}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <CustomInput
@@ -271,14 +248,7 @@ export const SignUp = () => {
             </Center>
           </Link>
         </Stack>
-        <Text
-          w="full"
-          color="gray.600"
-          fontSize="11px"
-          fontWeight="400"
-          letterSpacing="-0.056px"
-          textAlign={"center"}
-        >
+        <Text w="full" color="gray.600" fontSize="11px" fontWeight="400" letterSpacing="-0.056px" textAlign={"center"}>
           {`Bằng việc đăng ký, bạn xác nhận rằng bạn đã đọc, hiểu và đồng ý với `}
           <Link
             href="/terms"

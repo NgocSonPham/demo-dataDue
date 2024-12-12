@@ -50,7 +50,7 @@ export const Login = () => {
 
   React.useEffect(() => {
     if (isEmpty(user?.id?.toString())) return;
-    [USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId) ? navigate("/admin") : navigate("/");
+    [USER_ROLE.ADMIN, USER_ROLE.COLLABORATOR].includes(user.roleId) ? navigate("/admin") : navigate("/");
   }, [user, navigate]);
 
   React.useEffect(() => {

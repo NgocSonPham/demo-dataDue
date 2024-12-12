@@ -19,7 +19,7 @@ export const Admin = () => {
         return navigate("/login");
       }
 
-      if (location.pathname.includes("/admin") && ![USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)) {
+      if (location.pathname.includes("/admin") && ![USER_ROLE.ADMIN, USER_ROLE.COLLABORATOR].includes(user.roleId)) {
         return navigate("/");
       }
     }

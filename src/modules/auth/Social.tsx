@@ -51,7 +51,7 @@ export const Social = () => {
       await userService.getById(decode.userId);
     dispatch(setUser({ ...userInfo, accessToken, refreshToken }));
 
-    [USER_ROLE.ADMIN, USER_ROLE.CREATOR].includes(user.roleId)
+    [USER_ROLE.ADMIN, USER_ROLE.COLLABORATOR].includes(user.roleId)
       ? navigate("/admin")
       : navigate("/");
 

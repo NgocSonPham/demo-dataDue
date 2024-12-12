@@ -81,7 +81,7 @@ export default function UpdateRoleModal({
           <ModalBody pt={0} pb="40px">
             <RadioGroup onChange={setRole} value={role}>
               <Stack direction="row">
-                <Radio value={USER_ROLE.CREATOR}>Creator</Radio>
+                <Radio value={USER_ROLE.COLLABORATOR}>Collaborator</Radio>
                 <Radio value={USER_ROLE.GUEST}>Guest</Radio>
               </Stack>
             </RadioGroup>

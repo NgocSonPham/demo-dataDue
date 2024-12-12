@@ -61,7 +61,7 @@ export const isHasPermission = (
   action?: string
 ) => {
   const hasResource = permissions?.some(
-    (p) => p.resource === "*" || p.resource === resource
+    (p) => p.resource === "*" || (p.resource === resource && (p.action === "*" || p.action === "list"))
   );
   if (!hasResource) return false;
 
