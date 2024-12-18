@@ -5,9 +5,12 @@ import {
   BreadcrumbLink,
   Flex,
   Link,
+  useBreakpointValue,
   useColorModeValue,
 } from "@chakra-ui/react";
 import HeaderLinks from "./Links";
+import { useContext } from "react";
+import BooleanContext from "../context/ExpandContext";
 
 export default function Navbar(props: {
   message: string | boolean;
@@ -16,6 +19,7 @@ export default function Navbar(props: {
   onOpen: (...args: any[]) => any;
 }) {
   const { brandText } = props;
+  const { isExpand, setIsExpand } = useContext(BooleanContext);
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue("navy.700", "white");
@@ -32,6 +36,14 @@ export default function Navbar(props: {
   let secondaryMargin = "0px";
   let paddingX = "15px";
   let gap = "0px";
+
+  const widthCalc = useBreakpointValue({
+    base: "calc(100vw - 6%)",
+    md: "calc(100vw - 8%)",
+    lg: isExpand ? "calc(100vw - 350px)" : "calc(100vw - 250px)",
+    xl: isExpand ? "calc(100vw - 350px)" : "calc(100vw - 250px)",
+    "2xl": isExpand ? "calc(100vw - 365px)" : "calc(100vw - 200px)",
+  });
 
   return (
     <Box
@@ -68,13 +80,7 @@ export default function Navbar(props: {
       }}
       pt="8px"
       top={{ base: "12px", md: "16px", xl: "18px" }}
-      w={{
-        base: "calc(100vw - 6%)",
-        md: "calc(100vw - 8%)",
-        lg: "calc(100vw - 350px)",
-        xl: "calc(100vw - 350px)",
-        "2xl": "calc(100vw - 365px)",
-      }}
+      w={widthCalc}
       zIndex={1}
     >
       <Flex

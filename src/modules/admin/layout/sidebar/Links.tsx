@@ -7,11 +7,13 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { GoChevronDown, GoChevronUp, GoDotFill } from "react-icons/go";
 import { NavLink, useLocation } from "react-router-dom";
+import BooleanContext from "../context/ExpandContext";
 
 export function SidebarLinks(props: { routes: RoutesType[] }) {
+  const { isExpand, setIsExpand } = useContext(BooleanContext);
   //   Chakra color mode
   let location = useLocation();
   let activeColor = useColorModeValue("gray.700", "white");
@@ -49,19 +51,21 @@ export function SidebarLinks(props: { routes: RoutesType[] }) {
               >
                 {route.icon}
               </Box>
-              <Text
-                me="auto"
-                color={
-                  activeRoute(route.path.toLowerCase())
-                    ? activeColor
-                    : textColor
-                }
-                fontWeight={
-                  activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
-                }
-              >
-                {route.name}
-              </Text>
+              { isExpand &&
+                <Text
+                  me="auto"
+                  color={
+                    activeRoute(route.path.toLowerCase())
+                      ? activeColor
+                      : textColor
+                  }
+                  fontWeight={
+                    activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
+                  }
+                >
+                  {route.name}
+                </Text>
+              }
             </Flex>
             {!route.children && (
               <Box

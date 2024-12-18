@@ -1,4 +1,4 @@
-import { Box, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -9,9 +9,11 @@ import routes from "../routes";
 import Navbar from "./navbar";
 import Sidebar from "./sidebar";
 import Dashboard from "../pages/dashboard/Dashboard";
+import BooleanContext from "./context/ExpandContext";
 
 // Custom Chakra theme
 export default function AdminLayout(props: any) {
+  const [isExpand, setIsExpand] = React.useState(true);
   const { children, ...rest } = props;
   const user = useAppSelector(selectUser);
   const [routesState, setRoutesState] = React.useState([]);
@@ -48,7 +50,7 @@ export default function AdminLayout(props: any) {
         return;
       }
     }
-    setActiveRoute("Danh sách Roadmaps");
+    setActiveRoute("Chỉnh sửa");
   };
   const getActiveNavbarText = (routes: RoutesType[]): string | boolean => {
     let activeNavbar = false;
@@ -82,45 +84,53 @@ export default function AdminLayout(props: any) {
   };
   const { onOpen } = useDisclosure();
 
+  const widthCalc = useBreakpointValue({
+    base: "100%",
+    lg: isExpand ? "calc(100% - 290px)" : "calc(100% - 125px)",
+  });
+
   return (
     <Box>
-      <Sidebar routes={routesState} {...rest} />
-      <Box
-        float="right"
-        minHeight="100vh"
-        height="100%"
-        overflow="auto"
-        position="relative"
-        maxHeight="100%"
-        w={{ base: "100%", lg: "calc( 100% - 290px )" }}
-        maxWidth={{ base: "100%", lg: "calc( 100% - 290px )" }}
-        transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-        transitionDuration=".2s, .2s, .35s"
-        transitionProperty="top, bottom, width"
-        transitionTimingFunction="linear, linear, ease"
-        pt={{ base: "130px", md: "80px", xl: "80px" }}
-      >
-        <Navbar
-          onOpen={onOpen}
-          brandText={activeRoute}
-          message={getActiveNavbarText(routesState)}
-          fixed={fixed}
-          {...rest}
-        />
+      
+      <BooleanContext.Provider value={{ isExpand, setIsExpand }}>
+        <Sidebar routes={routesState} {...rest} sx={{ width: '300px' }}/>
+        <Box
+          float="right"
+          minHeight="100vh"
+          height="100%"
+          overflow="auto"
+          position="relative"
+          maxHeight="100%"
+          w={{ base: "100%", lg: widthCalc }}
+          maxWidth={{ base: "100%", lg: widthCalc }}
+          transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+          transitionDuration=".2s, .2s, .35s"
+          transitionProperty="top, bottom, width"
+          transitionTimingFunction="linear, linear, ease"
+          pt={{ base: "130px", md: "80px", xl: "80px" }}
+        >
+          <Navbar
+            onOpen={onOpen}
+            brandText={activeRoute}
+            message={getActiveNavbarText(routesState)}
+            fixed={fixed}
+            {...rest}
+          />
 
-        {getRoute() ? (
-          <Box
-            mx="auto"
-            p={{ base: "20px", md: "30px" }}
-            pe="20px"
-          >
-            <Routes>
-              {getRoutes(routesState)}
-              <Route path="/" element={<Dashboard />} />
-            </Routes>
-          </Box>
-        ) : null}
-      </Box>
+          {getRoute() ? (
+            <Box
+              mx="auto"
+              p={{ base: "20px", md: "30px" }}
+              pe="20px"
+            >
+              <Routes>
+                {getRoutes(routesState)}
+                <Route path="/" element={<Dashboard />} />
+              </Routes>
+            </Box>
+          ) : null}
+        </Box>
+      </BooleanContext.Provider>
     </Box>
   );
 }

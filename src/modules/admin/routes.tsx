@@ -19,15 +19,15 @@ import RoadmapList from "./pages/roadmap/RoadmapList";
 import RoadmapQuestion from "./pages/roadmap/RoadmapQuestion";
 
 const routes: RoutesType[] = [
-  {
-    name: "Danh sách Chuyên ngành",
-    path: "/majors",
-    resource: "majors",
-    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
-    component: <MajorList />,
-    level: 0,
-    sidebar: true
-  },
+  // {
+  //   name: "Danh sách Chuyên ngành",
+  //   path: "/majors",
+  //   resource: "majors",
+  //   icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+  //   component: <MajorList />,
+  //   level: 0,
+  //   sidebar: true
+  // },
   {
     name: "Cập nhật Chuyên ngành",
     path: "/majors/:id",
@@ -46,15 +46,15 @@ const routes: RoutesType[] = [
   //   level: 0,
   //   sidebar: true
   // },
-  {
-    name: "Danh sách Cơ sở đào tạo",
-    path: "/training-organizations",
-    resource: "training-organizations",
-    icon: <Icon as={BsBuildingsFill} width="20px" height="20px" color="inherit" />,
-    component: <TrainingOrganizationList />,
-    level: 0,
-    sidebar: true
-  },
+  // {
+  //   name: "Danh sách Cơ sở đào tạo",
+  //   path: "/training-organizations",
+  //   resource: "training-organizations",
+  //   icon: <Icon as={BsBuildingsFill} width="20px" height="20px" color="inherit" />,
+  //   component: <TrainingOrganizationList />,
+  //   level: 0,
+  //   sidebar: true
+  // },
   {
     name: "Cập nhật Cơ sở đào tạo",
     path: "/training-organizations/:id",

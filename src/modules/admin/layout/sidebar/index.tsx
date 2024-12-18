@@ -10,7 +10,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { IoMenuOutline } from "react-icons/io5";
 import SidebarContent from "./Content";
@@ -19,9 +19,12 @@ import {
   renderTrack,
   renderView,
 } from "../../../../components/Scrollbar";
+import BooleanContext from "../context/ExpandContext";
 
 function Sidebar(props: { routes: RoutesType[]; [x: string]: any }) {
   const { routes } = props;
+
+  const { isExpand, setIsExpand } = useContext(BooleanContext);
 
   let variantChange = "0.2s linear";
   let shadow = useColorModeValue(
@@ -38,7 +41,7 @@ function Sidebar(props: { routes: RoutesType[]; [x: string]: any }) {
       <Box
         bg={sidebarBg}
         transition={variantChange}
-        w="300px"
+        w={isExpand ? "300px" : '120px'}
         h="100vh"
         m={sidebarMargins}
         minH="100%"
