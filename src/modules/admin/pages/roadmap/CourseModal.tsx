@@ -1,7 +1,7 @@
-"use client";
-
 import {
   Button,
+  FormControl,
+  FormErrorMessage,
   HStack,
   Modal,
   ModalBody,
@@ -24,22 +24,27 @@ import { CustomInputNumber } from "../../../../components/CustomNumberInput";
 import CustomUploadButton from "../../../../components/CustomUploadButton";
 import courseService from "../../../../services/courseService";
 import { getErrorMessage } from "../../../../utils/helpers";
+import CustomSelect from "../../../../components/CustomSelect";
+import { useEffect } from "react";
 
 type FormType = {
   id?: number;
   name: string;
-  idx: number;
+  type: string;
+  specialityIds: any[];
+  description?: string;
   thumbnail?: string;
-  header?: string;
 };
 
-export default function LevelModal({
-  course,
+export default function CourseModal({
+  speciality,
+  specialityList,
   data,
   onUpdate,
   onClose
 }: {
-  course: any;
+  speciality: any;
+  specialityList: any[];
   data: any;
   onUpdate: (data: any) => void;
   onClose: () => void;
@@ -47,17 +52,24 @@ export default function LevelModal({
   const toast = useToast();
   const defaultValues = {
     ...data,
-    name: data?.name ?? `Level ${(course.levels?.length ?? 0) + 1}`,
-    idx: data?.idx ?? (course.levels?.length ?? 0) + 1
+    specialityIds: data?.specialityIds ?? (speciality ? [speciality.id] : [])
   };
 
-  const { control, setValue, watch, handleSubmit: onSubmit } = useForm<FormType>({ defaultValues });
+  const { control, setValue, watch, handleSubmit: onSubmit, reset } = useForm<FormType>({ defaultValues });
+
+  const init = async (id: number) => {
+    const { data: { data } = { data: {} } } = await courseService.getById(id);
+    reset(data);
+  };
+  
+  useEffect(() => {
+    if (isEmpty(data)) return;
+    init(data.id);
+  }, []);
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (dataUpdate: any) => {
-      return isEmpty(data)
-        ? courseService.createLevel(course.id, dataUpdate)
-        : courseService.updateLevel(course.id, data.id, dataUpdate);
+      return isEmpty(data) ? courseService.create(dataUpdate) : courseService.update(data.id, dataUpdate);
     },
     onSuccess: async (res: any) => {
       const { data: { data: updatedData } = { data: {} } } = res;
@@ -88,7 +100,7 @@ export default function LevelModal({
   };
 
   const handleUpload = async (name: string, file: string | string[]) => {
-    if (name === "thumbnail" || name === "header") {
+    if (name === "thumbnail") {
       setValue(name, typeof file === "object" ? file[0] : (file as string));
       return;
     }
@@ -115,15 +127,56 @@ export default function LevelModal({
                 rules={{ required: "Tên không được để trống" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <CustomInput
-                    label="Tên level"
+                    label="Tên khóa học"
                     isRequired
-                    disabled={true}
                     value={value}
                     error={error}
                     onTextChange={(value) => onChange(value)}
                   />
                 )}
               />
+              <Controller
+                control={control}
+                name="type"
+                rules={{ required: "Loại không được để trống" }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <FormControl isInvalid={!!error}>
+                    <CustomSelect
+                      w="full"
+                      placeholder="Chọn loại.."
+                      allowAddNew={false}
+                      name={"type"}
+                      value={[value]}
+                      options={["Vai trò", "Luyện thi", "Tech stack"].map((item) => ({ label: item, value: item }))}
+                      onSelected={(value) => onChange(value[0])}
+                    />
+
+                    {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="specialityIds"
+                rules={{ required: "Ngành không được để trống" }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <FormControl isInvalid={!!error}>
+                    <CustomSelect
+                      w="full"
+                      placeholder="Chọn ngành.."
+                      allowAddNew={false}
+                      multiple
+                      name={"specialityIds"}
+                      value={value}
+                      options={specialityList.map((item) => ({ label: item.name, value: item.id }))}
+                      onSelected={(value) => onChange(value)}
+                    />
+
+                    {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                  </FormControl>
+                )}
+              />
+
               <CustomUploadButton
                 bg={"secondaryGray.300"}
                 h="100px"
@@ -136,30 +189,16 @@ export default function LevelModal({
                 w="120px"
                 minW="120px"
               />
-              <CustomUploadButton
-                bg={"secondaryGray.300"}
-                h="100px"
-                label="Add header"
-                onUploadChange={handleUpload}
-                name={`header`}
-                src={watch("header") ?? ""}
-                thumbnail
-                rounded="8px"
-                w="120px"
-                minW="120px"
-              />
               <Controller
-                name="idx"
+                name="description"
                 control={control}
-                rules={{ required: "Thứ tự không được để trống" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <CustomInputNumber
-                    label="Thứ tự"
-                    isRequired
-                    disabled={true}
+                  <CustomInput
+                    label="Mô tả khóa học"
+                    isMultipleLines
                     value={value}
                     error={error}
-                    onChange={(value) => onChange(value)}
+                    onTextChange={(value) => onChange(value)}
                   />
                 )}
               />

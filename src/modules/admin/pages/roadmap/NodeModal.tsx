@@ -31,7 +31,6 @@ import { getErrorMessage } from "../../../../utils/helpers";
 type FormType = {
   id?: number;
   name: string;
-  specialityId: number;
   levelId: number;
   type: string;
   icon?: string;
@@ -39,13 +38,13 @@ type FormType = {
 };
 
 export default function NodeModal({
-  speciality,
+  course,
   levelId,
   data,
   onUpdate,
   onClose
 }: {
-  speciality: any;
+  course: any;
   levelId: number;
   data: any;
   onUpdate: (id: number, data: any) => void;
@@ -58,7 +57,7 @@ export default function NodeModal({
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (dataUpdate: any) => {
-      const obj = { ...dataUpdate, specialityId: speciality.id, levelId };
+      const obj = { ...dataUpdate, courseId: course.id, levelId };
       return isEmpty(data) ? roadmapService.create(obj) : roadmapService.update(data.id, obj);
     },
     onSuccess: async (res: any) => {

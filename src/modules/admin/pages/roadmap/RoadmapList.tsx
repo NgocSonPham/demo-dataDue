@@ -1,5 +1,5 @@
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { DeleteIcon, EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { Box, Button, Divider, Flex, HStack, Icon, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
@@ -11,6 +11,9 @@ import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
 import NodeModal from "./NodeModal";
 import LevelModal from "./LevelModal";
+import courseService from "../../../../services/courseService";
+import CourseModal from "./CourseModal";
+import { isEmpty } from "lodash";
 
 export default function RoadmapList() {
   const toast = useToast();
@@ -18,6 +21,11 @@ export default function RoadmapList() {
 
   const [specialityList, setSpecialityList] = React.useState([]);
   const [specialitySelected, setSpecialitySelected] = React.useState<any>();
+
+  const [courseList, setCourseList] = React.useState([]);
+  const [courseSelected, setCourseSelected] = React.useState<any>();
+  const [courseUpdate, setCourseUpdate] = React.useState<any>();
+  const { isOpen: isOpenCourse, onOpen: onOpenCourse, onClose: onCloseCourse } = useDisclosure();
 
   const [levelSelected, setLevelSelected] = React.useState<any>();
   const { isOpen: isOpenLevel, onOpen: onOpenLevel, onClose: onCloseLevel } = useDisclosure();
@@ -30,6 +38,7 @@ export default function RoadmapList() {
   const [questionList, setQuestionList] = React.useState([]);
 
   const [deletingObj, setDeletingObj] = React.useState<any>();
+  const { isOpen: isOpenDeleteCourse, onOpen: onOpenDeleteCourse, onClose: onCloseDeleteCourse } = useDisclosure();
   const { isOpen: isOpenDeleteNode, onOpen: onOpenDeleteNode, onClose: onCloseDeleteNode } = useDisclosure();
   const {
     isOpen: isOpenDeleteQuestion,
@@ -42,18 +51,31 @@ export default function RoadmapList() {
     setSpecialityList(list.rows);
   };
 
+  const initCourses = async (specialityId: number) => {
+    const { data: { data: list } = { data: {} } } = await specialityService.getAllCourses(specialityId);
+    setCourseList(list);
+  };
+
   React.useEffect(() => {
     init();
   }, []);
 
   const initSpeciality = async (id: number) => {
-    const { data: { data } = { data: {} } } = await specialityService.getById(id);
+    // const { data: { data } = { data: {} } } = await specialityService.getById(id);
+    const data = specialityList.find((item: any) => item.id === id);
     setSpecialitySelected(data);
-  }
+    initCourses(data.id);
+  };
+
+  const initCourse = async (id: number) => {
+    // const { data: { data } = { data: {} } } = await courseService.getById(id);
+    const data = courseList.find((item: any) => item.id === id);
+    setCourseSelected(data);
+  };
 
   const initRoadmap = async (level: any) => {
     const { data: { data: list } = { data: {} } } = await roadmapService.getAll({
-      specialityId: specialitySelected.id,
+      courseId: courseSelected.id,
       levelId: level.id
     });
     setLevelSelected(level);
@@ -70,6 +92,7 @@ export default function RoadmapList() {
   const handleSelectSpeciality = (id: number) => {
     if (isNaN(id)) return;
     initSpeciality(id);
+    setCourseSelected({});
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
@@ -77,9 +100,58 @@ export default function RoadmapList() {
 
   const handleUnSelectSpeciality = () => {
     setSpecialitySelected({});
+    setCourseSelected({});
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
+  };
+
+  const handleSelectCourse = (id: number) => {
+    if (isNaN(id)) return;
+    initCourse(id);
+    setLevelSelected(null);
+    setRoadmapList([]);
+    setQuestionList([]);
+  };
+
+  const handleUnSelectCourse = () => {
+    setCourseSelected({});
+    setLevelSelected(null);
+    setRoadmapList([]);
+    setQuestionList([]);
+  };
+
+  const handleAddCourse = async () => {
+    setCourseUpdate({});
+    onOpenCourse();
+  };
+
+  const handleUpdateCourse = async (course: any) => {
+    setCourseUpdate(course);
+    onOpenCourse();
+  };
+
+  const handleDeleteCourse = async (obj: any) => {
+    setDeletingObj(obj);
+    onOpenDeleteCourse();
+  };
+
+  const confirmDeleteCourse = async (id: number) => {
+    try {
+      const { data: { data: _updated } = { data: {} } } = await courseService.delete(id);
+
+      setDeletingObj(null);
+      setCourseSelected({});
+      initCourses(specialitySelected.id);
+      onCloseDeleteNode();
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
+      });
+    }
   };
 
   const handleAddLevel = async () => {
@@ -92,13 +164,13 @@ export default function RoadmapList() {
     onOpenLevel();
   };
 
-  const handleUpdateLevelFinal = async (speciality: any) => {
-    setSpecialitySelected(speciality);
+  const handleUpdateLevelFinal = async (course: any) => {
+    setCourseSelected(course);
   };
 
   const handleDeleteLevel = async (level: any) => {
     try {
-      const hasLevel = specialitySelected.levels.some((item: any) => item.idx > level.idx);
+      const hasLevel = courseSelected.levels.some((item: any) => item.idx > level.idx);
       if (hasLevel) {
         toast({
           position: "top-right",
@@ -107,11 +179,8 @@ export default function RoadmapList() {
         return;
       }
 
-      const { data: { data: updated } = { data: {} } } = await specialityService.deleteLevel(
-        specialitySelected.id,
-        level.id
-      );
-      setSpecialitySelected(updated);
+      const { data: { data: updated } = { data: {} } } = await courseService.deleteLevel(courseSelected.id, level.id);
+      setCourseSelected(updated);
       setLevelSelected(null);
     } catch (error) {
       const message = getErrorMessage(error);
@@ -197,7 +266,7 @@ export default function RoadmapList() {
     <CustomCard flexDirection="column" w="100%" px="0px" minH="600px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Stack w="full" direction={{ base: "column", md: "row" }} spacing={0} align="flex-start">
         <VStack w="300px" minW="300px" spacing={"12px"} align="flex-start">
-          <Flex w="full" pl="25px" mb="8px" justifyContent="flex-start" align="center" gap={"10px"}>
+          <Flex w="full" pl="25px" justifyContent="flex-start" align="center" gap={"10px"}>
             <CustomSelect
               w="full"
               placeholder="Chọn ngành.."
@@ -212,11 +281,45 @@ export default function RoadmapList() {
               onRemove={(_value, _idx) => handleUnSelectSpeciality()}
             />
           </Flex>
+          <HStack w="full" pl="25px" gap={"2px"}>
+            <CustomSelect
+              w="full"
+              placeholder="Chọn khóa học.."
+              allowAddNew={false}
+              name={"speciality"}
+              value={[courseSelected?.id ?? ""]}
+              options={courseList.map((item: any) => ({
+                label: item.name,
+                value: item.id
+              }))}
+              onSelected={(value) => handleSelectCourse(parseInt(value[0]))}
+              onRemove={(_value, _idx) => handleUnSelectCourse()}
+            />
+            {!isEmpty(courseSelected) && (
+              <>
+                <EditIcon
+                  color="brand.600"
+                  w="15px"
+                  h="15px"
+                  cursor={"pointer"}
+                  onClick={() => handleUpdateCourse(courseSelected)}
+                />
+                <DeleteIcon
+                  color="red.500"
+                  w="15px"
+                  h="15px"
+                  cursor={"pointer"}
+                  onClick={() => handleDeleteCourse(courseSelected)}
+                />
+              </>
+            )}
+            <PlusSquareIcon color="brand.600" w="15px" h="15px" cursor={"pointer"} onClick={handleAddCourse} />
+          </HStack>
           <VStack w="full" pl="25px" spacing={"12px"} align="flex-start">
-            <Button w="full" border={"dashed"} onClick={handleAddLevel}>
+            <Button w="full" border={"1px dashed"} onClick={handleAddLevel}>
               {"Thêm level"}
             </Button>
-            {specialitySelected?.levels?.map((item: any) => (
+            {courseSelected?.levels?.map((item: any) => (
               <Flex key={item.id} w="full" align="center" gap="10px">
                 <Button variant={"brand"} w="full" bg={"brand.900"} onClick={() => initRoadmap(item)}>
                   {item.name}
@@ -243,7 +346,7 @@ export default function RoadmapList() {
           <Divider orientation="vertical" />
         </Box>
         <VStack w="300px" minW="300px" spacing={"12px"} align="flex-start">
-          <Button w="full" border={"dashed"} onClick={handleAddNode}>
+          <Button w="full" border={"1px dashed"} onClick={handleAddNode}>
             {"Thêm node"}
           </Button>
           <Box w="full" maxH="680px" overflowY={"scroll"}>
@@ -280,7 +383,7 @@ export default function RoadmapList() {
         <VStack w="full" spacing={"12px"} align="flex-start" pr={"25px"}>
           <Button
             w="full"
-            border={"dashed"}
+            border={"1px dashed"}
             onClick={() => {
               navigate(`/admin/roadmaps/${roadmapSelected}/questions/new`);
             }}
@@ -316,9 +419,18 @@ export default function RoadmapList() {
           </Box>
         </VStack>
       </Stack>
+      {isOpenCourse && (
+        <CourseModal
+          speciality={specialitySelected}
+          specialityList={specialityList}
+          data={courseUpdate}
+          onUpdate={() => initCourses(specialitySelected.id)}
+          onClose={onCloseCourse}
+        />
+      )}
       {isOpenLevel && (
         <LevelModal
-          speciality={specialitySelected}
+          course={courseSelected}
           data={levelSelected}
           onUpdate={handleUpdateLevelFinal}
           onClose={onCloseLevel}
@@ -326,11 +438,21 @@ export default function RoadmapList() {
       )}
       {isOpenNode && (
         <NodeModal
-          speciality={specialitySelected}
+          course={courseSelected}
           levelId={levelSelected.id}
           data={roadmapUpdate}
           onUpdate={handleUpdateRoadmap}
           onClose={onCloseNode}
+        />
+      )}
+      {isOpenDeleteCourse && deletingObj && (
+        <CustomConfirmAlert
+          title={`Remove ${deletingObj.name}`}
+          question={"Are you sure to remove this Course?"}
+          cancelText={"Cancel"}
+          confirmText={"Confirm"}
+          onClose={onCloseDeleteCourse}
+          onConfirm={() => confirmDeleteCourse(deletingObj.id)}
         />
       )}
       {isOpenDeleteNode && deletingObj && (
