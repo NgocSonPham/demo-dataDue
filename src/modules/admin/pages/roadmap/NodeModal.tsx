@@ -151,7 +151,7 @@ export default function NodeModal({
                       options={[
                         {
                           label: "Thông thường",
-                          value: "common-test"
+                          value: "normal-test"
                         },
                         {
                           label: "Luyện tập",

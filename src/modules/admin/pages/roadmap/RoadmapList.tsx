@@ -68,8 +68,8 @@ export default function RoadmapList() {
   };
 
   const initCourse = async (id: number) => {
-    // const { data: { data } = { data: {} } } = await courseService.getById(id);
-    const data = courseList.find((item: any) => item.id === id);
+    const { data: { data } = { data: {} } } = await courseService.getById(id);
+    // const data = courseList.find((item: any) => item.id === id);
     setCourseSelected(data);
   };
 
