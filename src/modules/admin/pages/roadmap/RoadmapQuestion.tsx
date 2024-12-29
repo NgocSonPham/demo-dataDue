@@ -28,6 +28,8 @@ type FormType = {
   sandbox?: any;
   hint?: string;
   guide?: string;
+  exp?: number;
+  nut?: number;
 };
 
 export default function RoadmapQuestion() {
@@ -116,78 +118,114 @@ export default function RoadmapQuestion() {
         </Button>
       </HStack>
       <VStack spacing={4} align="flex-start">
-        <Controller
-          name="title"
-          control={control}
-          rules={{ required: "Câu hỏi không được để trống" }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <CustomInput
-              label="Câu hỏi"
-              isRequired
-              value={value}
-              error={error}
-              onTextChange={(value) => onChange(value)}
+        <HStack w="full" justify="space-between" align={"stretch"} gap="20px">
+          <VStack w="50%" spacing={4} align="flex-start">
+            <Controller
+              name="title"
+              control={control}
+              rules={{ required: "Câu hỏi không được để trống" }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <CustomInput
+                  label="Câu hỏi"
+                  isRequired
+                  value={value}
+                  error={error}
+                  onTextChange={(value) => onChange(value)}
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          control={control}
-          name="type"
-          rules={{ required: "Loại không được để trống" }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <FormControl isInvalid={!!error}>
-              <CustomSelect
-                w="full"
-                placeholder="Chọn loại.."
-                allowAddNew={false}
-                name={"type"}
-                value={[value]}
-                options={[
-                  {
-                    label: "Hot spot",
-                    value: "hot-spot"
-                  },
-                  {
-                    label: "Snippet",
-                    value: "snippet"
-                  },
-                  {
-                    label: "Multi choices",
-                    value: "multi-choices"
-                  },
-                  {
-                    label: "Single choice",
-                    value: "single-choice"
-                  },
-                  {
-                    label: "Drag & Drop",
-                    value: "drag-drop"
-                  }
-                ]}
-                onSelected={(value) => {
-                  onChange(value[0]);
-                  if (["multi-choices", "single-choice", "drag-drop"].includes(value[0])) setValue("answer", []);
-                }}
-              />
+            <Controller
+              control={control}
+              name="type"
+              rules={{ required: "Loại không được để trống" }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <FormControl isInvalid={!!error}>
+                  <CustomSelect
+                    w="full"
+                    placeholder="Chọn loại.."
+                    allowAddNew={false}
+                    name={"type"}
+                    value={[value]}
+                    options={[
+                      {
+                        label: "Hot spot",
+                        value: "hot-spot"
+                      },
+                      {
+                        label: "Snippet",
+                        value: "snippet"
+                      },
+                      {
+                        label: "Multi choices",
+                        value: "multi-choices"
+                      },
+                      {
+                        label: "Single choice",
+                        value: "single-choice"
+                      },
+                      {
+                        label: "Drag & Drop",
+                        value: "drag-drop"
+                      }
+                    ]}
+                    onSelected={(value) => {
+                      onChange(value[0]);
+                      if (["multi-choices", "single-choice", "drag-drop"].includes(value[0])) setValue("answer", []);
+                    }}
+                  />
 
-              {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-            </FormControl>
-          )}
-        />
-        <Controller
-          name="idx"
-          control={control}
-          rules={{ required: "Thứ tự không được để trống" }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <CustomInputNumber
-              label="Thứ tự"
-              isRequired
-              value={value}
-              error={error}
-              onChange={(value) => onChange(value)}
+                  {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                </FormControl>
+              )}
             />
-          )}
-        />
+            <Controller
+              name="idx"
+              control={control}
+              rules={{ required: "Thứ tự không được để trống" }}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <CustomInputNumber
+                  label="Thứ tự"
+                  isRequired
+                  value={value}
+                  error={error}
+                  onChange={(value) => onChange(value)}
+                />
+              )}
+            />
+          </VStack>
+          <VStack w="50%" align={"start"}>
+            <Text fontSize={"16px"} fontWeight={600} w="full">
+              {"Phần thưởng"}
+            </Text>
+            <Controller
+              name="exp"
+              control={control}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <CustomInputNumber
+                  label="Kinh nghiệm"
+                  isRequired
+                  value={value ?? 0}
+                  error={error}
+                  onChange={(value) => onChange(value)}
+                />
+              )}
+            />
+            <Controller
+              name="nut"
+              control={control}
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <CustomInputNumber
+                  label="Hạt dẻ"
+                  isRequired
+                  value={value ?? 0}
+                  error={error}
+                  onChange={(value) => onChange(value)}
+                />
+              )}
+            />
+          </VStack>
+        </HStack>
+
         <VStack w="full" align="flex-start" spacing={1}>
           <Text fontWeight={"bold"}>{"Mô tả câu hỏi"}</Text>
           {(questionId === "new" || (questionId != "new" && !isEmpty(watch("description")))) && (

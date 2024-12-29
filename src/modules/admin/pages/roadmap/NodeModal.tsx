@@ -35,6 +35,8 @@ type FormType = {
   type: string;
   icon?: string;
   idx: number;
+  exp?: number;
+  nut?: number;
 };
 
 export default function NodeModal({
@@ -183,6 +185,40 @@ export default function NodeModal({
                   />
                 )}
               />
+              {/* Phần thưởng */}
+              {[`practice`, `final-test`].includes(watch("type")) && (
+                <>
+                  <Text fontSize={"20px"} fontWeight={600}>
+                    {"Phần thưởng"}
+                  </Text>
+                  <Controller
+                    name="exp"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInputNumber
+                        label="Kinh nghiệm"
+                        isRequired
+                        value={value ?? 0}
+                        error={error}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="nut"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInputNumber
+                        label="Hạt dẻ"
+                        isRequired
+                        value={value ?? 0}
+                        error={error}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                </>
+              )}
             </VStack>
           </ModalBody>
           <ModalFooter>
