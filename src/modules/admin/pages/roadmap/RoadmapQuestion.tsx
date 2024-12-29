@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import ContentEditor from "../../../../components/ContentEditor";
 import CustomCard from "../../../../components/CustomCard";
@@ -33,7 +33,11 @@ type FormType = {
 export default function RoadmapQuestion() {
   const toast = useToast();
   const { id, questionId } = useParams();
+  const [searchParams] = useSearchParams();
+
   const navigate = useNavigate();
+
+  const lessonId = searchParams.get("lessonId");
 
   const defaultValues = {
     title: "",
@@ -58,7 +62,7 @@ export default function RoadmapQuestion() {
   const { mutate, isLoading } = useMutation({
     mutationFn: (dataUpdate: any) => {
       return questionId === "new"
-        ? roadmapService.createQuestion(id, dataUpdate)
+        ? roadmapService.createQuestion(id, { ...dataUpdate, lessonId })
         : roadmapService.updateQuestion(id, questionId, dataUpdate);
     },
     onSuccess: async (res: any) => {

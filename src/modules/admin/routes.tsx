@@ -17,6 +17,7 @@ import UserList from "./pages/user/UserList";
 import PostDetail from "./pages/post/PostDetail";
 import RoadmapList from "./pages/roadmap/RoadmapList";
 import RoadmapQuestion from "./pages/roadmap/RoadmapQuestion";
+import RoadmapLesson from "./pages/roadmap/RoadmapLesson";
 
 const routes: RoutesType[] = [
   // {
@@ -123,6 +124,14 @@ const routes: RoutesType[] = [
     component: <RoadmapList />,
     level: 0,
     sidebar: true
+  },
+  {
+    name: "Cập nhật Roadmap Lesson",
+    path: "/roadmaps/:id/lessons/:lessonId",
+    resource: "roadmaps",
+    component: <RoadmapLesson />,
+    level: 0,
+    sidebar: false
   },
   {
     name: "Cập nhật Roadmap Question",

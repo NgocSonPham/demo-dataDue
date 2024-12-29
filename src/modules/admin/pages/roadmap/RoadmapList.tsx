@@ -13,7 +13,7 @@ import NodeModal from "./NodeModal";
 import LevelModal from "./LevelModal";
 import courseService from "../../../../services/courseService";
 import CourseModal from "./CourseModal";
-import { isEmpty } from "lodash";
+import { isEmpty, set } from "lodash";
 
 export default function RoadmapList() {
   const toast = useToast();
@@ -35,11 +35,15 @@ export default function RoadmapList() {
   const [roadmapSelected, setRoadmapSelected] = React.useState<any>();
   const { isOpen: isOpenNode, onOpen: onOpenNode, onClose: onCloseNode } = useDisclosure();
 
+  const [lessonList, setLessonList] = React.useState([]);
+  const [lessonSelected, setLessonSelected] = React.useState<any>();
+
   const [questionList, setQuestionList] = React.useState([]);
 
   const [deletingObj, setDeletingObj] = React.useState<any>();
   const { isOpen: isOpenDeleteCourse, onOpen: onOpenDeleteCourse, onClose: onCloseDeleteCourse } = useDisclosure();
   const { isOpen: isOpenDeleteNode, onOpen: onOpenDeleteNode, onClose: onCloseDeleteNode } = useDisclosure();
+  const { isOpen: isOpenDeleteLesson, onOpen: onOpenDeleteLesson, onClose: onCloseDeleteLesson } = useDisclosure();
   const {
     isOpen: isOpenDeleteQuestion,
     onOpen: onOpenDeleteQuestion,
@@ -54,6 +58,11 @@ export default function RoadmapList() {
   const initCourses = async (specialityId: number) => {
     const { data: { data: list } = { data: {} } } = await specialityService.getAllCourses(specialityId);
     setCourseList(list);
+  };
+
+  const initLessons = async (roadmapId: number) => {
+    const { data: { data: list } = { data: {} } } = await roadmapService.getAllLessons(roadmapId);
+    setLessonList(list);
   };
 
   React.useEffect(() => {
@@ -83,10 +92,25 @@ export default function RoadmapList() {
     setQuestionList([]);
   };
 
-  const initRoadmapQuestions = async (roadmapId: any) => {
-    const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestion(roadmapId);
-    setRoadmapSelected(roadmapId);
+  const initLesson = async (lessonId: any) => {
+    setLessonSelected(lessonList.find((item: any) => item.id === lessonId));
+    const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestions(roadmapSelected.id, {
+      lessonId
+    });
     setQuestionList(list.rows);
+  };
+
+  const initRoadmapQuestions = async (roadmap: any) => {
+    setRoadmapSelected(roadmap);
+    setLessonSelected({});
+    if (["practice", "final-test"].includes(roadmap.type)) {
+      const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestions(roadmap.id);
+      setQuestionList(list.rows);
+    } else {
+      const { data: { data: list } = { data: {} } } = await roadmapService.getAllLessons(roadmap.id);
+      setLessonList(list.rows);
+      setQuestionList([]);
+    }
   };
 
   const handleSelectSpeciality = (id: number) => {
@@ -240,6 +264,41 @@ export default function RoadmapList() {
     }
   };
 
+  const handleSelectLesson = (id: number) => {
+    if (isNaN(id)) return;
+    initLesson(id);
+    setQuestionList([]);
+  };
+
+  const handleUnSelectLesson = () => {
+    setLessonSelected({});
+    setLessonSelected(null);
+    setQuestionList([]);
+  };
+
+  const handleDeleteLesson = async (obj: any) => {
+    setDeletingObj(obj);
+    onOpenDeleteLesson();
+  };
+
+  const confirmDeleteLesson = async (id: number) => {
+    try {
+      const { data: { data: _updated } = { data: {} } } = await roadmapService.deleteLesson(roadmapSelected.id, id);
+
+      setDeletingObj(null);
+      setLessonSelected({});
+      initLessons(roadmapSelected.id);
+      onCloseDeleteLesson();
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
+      });
+    }
+  };
+
   const handleDeleteQuestion = async (obj: any) => {
     setDeletingObj(obj);
     onOpenDeleteQuestion();
@@ -355,7 +414,7 @@ export default function RoadmapList() {
                 .sort((a: any, b: any) => a.idx - b.idx)
                 .map((item: any) => (
                   <Flex key={item.id} w="full" align="center" gap="10px">
-                    <Button variant={"brand"} w="full" bg={"brand.800"} onClick={() => initRoadmapQuestions(item.id)}>
+                    <Button variant={"brand"} w="full" bg={"brand.800"} onClick={() => initRoadmapQuestions(item)}>
                       {item.name}
                     </Button>
                     <EditIcon
@@ -381,11 +440,49 @@ export default function RoadmapList() {
           <Divider orientation="vertical" />
         </Box>
         <VStack w="full" spacing={"12px"} align="flex-start" pr={"25px"}>
+          <HStack w="full" gap={"2px"}>
+            <CustomSelect
+              w="full"
+              placeholder="Chọn bài học.."
+              allowAddNew={false}
+              name={"lesson"}
+              value={[lessonSelected?.id ?? ""]}
+              options={lessonList.map((item: any) => ({
+                label: item.title,
+                value: item.id
+              }))}
+              onSelected={(value) => handleSelectLesson(parseInt(value[0]))}
+              onRemove={(_value, _idx) => handleUnSelectLesson()}
+            />
+            {!isEmpty(lessonSelected) && (
+              <>
+                <EditIcon
+                  color="brand.600"
+                  w="15px"
+                  h="15px"
+                  cursor={"pointer"}
+                  onClick={() => {
+                    navigate(`/admin/roadmaps/${roadmapSelected.id}/lessons/${lessonSelected.id}`);
+                  }}
+                />
+                <DeleteIcon color="red.500" w="15px" h="15px" cursor={"pointer"} onClick={handleDeleteLesson} />
+              </>
+            )}
+            <PlusSquareIcon
+              color="brand.600"
+              w="15px"
+              h="15px"
+              cursor={"pointer"}
+              onClick={() => {
+                navigate(`/admin/roadmaps/${roadmapSelected.id}/lessons/new`);
+              }}
+            />
+          </HStack>
           <Button
             w="full"
             border={"1px dashed"}
             onClick={() => {
-              navigate(`/admin/roadmaps/${roadmapSelected}/questions/new`);
+              navigate(`/admin/roadmaps/${roadmapSelected.id}/questions/new${lessonSelected ? `?lessonId=${lessonSelected.id}` : ""}`);
             }}
           >
             {"Thêm câu hỏi"}
@@ -403,7 +500,7 @@ export default function RoadmapList() {
                     h="15px"
                     cursor={"pointer"}
                     onClick={() => {
-                      navigate(`/admin/roadmaps/${roadmapSelected}/questions/${item.id}`);
+                      navigate(`/admin/roadmaps/${roadmapSelected.id}/questions/${item.id}`);
                     }}
                   />
                   <DeleteIcon
@@ -463,6 +560,16 @@ export default function RoadmapList() {
           confirmText={"Confirm"}
           onClose={onCloseDeleteNode}
           onConfirm={() => confirmDeleteNode(deletingObj.id)}
+        />
+      )}
+      {isOpenDeleteLesson && deletingObj && (
+        <CustomConfirmAlert
+          title={`Remove ${deletingObj.name}`}
+          question={"Are you sure to remove this Lesson?"}
+          cancelText={"Cancel"}
+          confirmText={"Confirm"}
+          onClose={onCloseDeleteLesson}
+          onConfirm={() => confirmDeleteLesson(deletingObj.id)}
         />
       )}
       {isOpenDeleteQuestion && deletingObj && (
