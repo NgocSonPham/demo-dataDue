@@ -73,6 +73,7 @@ export default function AdminLayout(props: any) {
     }, []);
   };
   const getRoutes = (routes: RoutesType[]): any => {
+    console.log(routes);
     const flatRoutes = flattenRoutes(routes);
     return flatRoutes.map((route: RoutesType, key: any) => {
       if (route.component && !route.noLayout) {
