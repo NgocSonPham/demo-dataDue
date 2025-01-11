@@ -1,23 +1,21 @@
 import { Icon } from "@chakra-ui/react";
-import { BsBuildingsFill } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
 import { IoIosDocument } from "react-icons/io";
-import { MdBarChart, MdOutlineSubject } from "react-icons/md";
+import { MdOutlineSubject } from "react-icons/md";
 import MainCategoryDetail from "./pages/main-category/MainCategoryDetail";
 import MainCategoryList from "./pages/main-category/MainCategoryList";
 import MajorDetail from "./pages/major/MajorDetail";
-import MajorList from "./pages/major/MajorList";
+import NotificationList from "./pages/notification/NotificationList";
+import PostDetail from "./pages/post/PostDetail";
 import PostList from "./pages/post/PostList";
+import RoadmapLesson from "./pages/roadmap/RoadmapLesson";
+import RoadmapList from "./pages/roadmap/RoadmapList";
+import RoadmapQuestion from "./pages/roadmap/RoadmapQuestion";
 import SubCategoryDetail from "./pages/sub-category/SubCategoryDetail";
 import SubCategoryList from "./pages/sub-category/SubCategoryList";
 import TrainingOrganizationDetail from "./pages/training-organization/TrainingOrganizationDetail";
-import TrainingOrganizationList from "./pages/training-organization/TrainingOrganizationList";
 import UserList from "./pages/user/UserList";
-import PostDetail from "./pages/post/PostDetail";
-import RoadmapList from "./pages/roadmap/RoadmapList";
-import RoadmapQuestion from "./pages/roadmap/RoadmapQuestion";
-import RoadmapLesson from "./pages/roadmap/RoadmapLesson";
 
 const routes: RoutesType[] = [
   // {
@@ -149,6 +147,14 @@ const routes: RoutesType[] = [
     component: <UserList />,
     level: 0,
     sidebar: true
+  },
+  {
+    name: "Danh sách thông báo",
+    path: "/notifications",
+    // resource: "roadmaps",
+    component: <NotificationList />,
+    level: 0,
+    sidebar: false
   }
 ];
 

@@ -33,6 +33,7 @@ export default function AdminLayout(props: any) {
       return isHasPermission(user.permissions, route.resource);
     });
     setRoutesState(finalRoutes);
+    getActiveRoute(finalRoutes);
   }, [user]);
 
   // functions for changing the states from components
@@ -73,7 +74,6 @@ export default function AdminLayout(props: any) {
     }, []);
   };
   const getRoutes = (routes: RoutesType[]): any => {
-    console.log(routes);
     const flatRoutes = flattenRoutes(routes);
     return flatRoutes.map((route: RoutesType, key: any) => {
       if (route.component && !route.noLayout) {
@@ -87,14 +87,13 @@ export default function AdminLayout(props: any) {
 
   const widthCalc = useBreakpointValue({
     base: "100%",
-    lg: isExpand ? "calc(100% - 290px)" : "calc(100% - 125px)",
+    lg: isExpand ? "calc(100% - 290px)" : "calc(100% - 125px)"
   });
 
   return (
     <Box>
-      
       <BooleanContext.Provider value={{ isExpand, setIsExpand }}>
-        <Sidebar routes={routesState} {...rest} sx={{ width: '300px' }}/>
+        <Sidebar routes={routesState} {...rest} sx={{ width: "300px" }} />
         <Box
           float="right"
           minHeight="100vh"
@@ -119,11 +118,7 @@ export default function AdminLayout(props: any) {
           />
 
           {getRoute() ? (
-            <Box
-              mx="auto"
-              p={{ base: "20px", md: "30px" }}
-              pe="20px"
-            >
+            <Box mx="auto" p={{ base: "20px", md: "30px" }} pe="20px">
               <Routes>
                 {getRoutes(routesState)}
                 <Route path="/" element={<Dashboard />} />

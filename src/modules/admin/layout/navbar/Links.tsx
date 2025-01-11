@@ -1,5 +1,7 @@
 import {
   Avatar,
+  Box,
+  Center,
   Flex,
   Icon,
   Menu,
@@ -8,6 +10,7 @@ import {
   MenuList,
   Text,
   useColorModeValue,
+  useToast
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { MdNotificationsNone } from "react-icons/md";
@@ -18,6 +21,13 @@ import { selectUser, setUser } from "../../../../redux/slice";
 import { userFullnameOrUsername } from "../../../../utils/helpers";
 import routes from "../../routes";
 import { SidebarResponsive } from "../sidebar";
+import { ItemContent } from "./ItemContent";
+import React from "react";
+import { isEmpty } from "lodash";
+import { collection, getCountFromServer, query, Timestamp, where } from "firebase/firestore";
+import { db } from "../../../../utils/firebase";
+import useNotification from "../../../../hooks/useNotification";
+import AppToast from "../../../../components/AppToast";
 
 export default function HeaderLinks() {
   // Chakra Color Mode
@@ -30,10 +40,52 @@ export default function HeaderLinks() {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
+  const toast = useToast();
 
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
+  const { notification } = useNotification();
+
+  React.useEffect(() => {
+    if (!isEmpty(notification)) {
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => (
+          <AppToast
+            status={"info"}
+            title={notification.title}
+            subtitle={notification.body}
+            link="/admin/notifications"
+            onClose={onClose}
+          />
+        )
+      });
+    }
+  }, [notification]);
+
+  const [unreadNotifications, setUnreadNotifications] = React.useState(0);
+
+  const getUnreadNotifications = async () => {
+    if (isEmpty(user) || isEmpty(user.id?.toString())) return;
+
+    const q = query(
+      collection(db, "notification"),
+      where("uid", "==", user.id.toString()),
+      where("read", "==", false),
+      where("createdAt", ">", Timestamp.fromMillis(user.seenNotificationAt))
+    );
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  };
+
+  React.useEffect(() => {
+    if (isEmpty(user) || isEmpty(user.id?.toString())) return;
+
+    getUnreadNotifications().then((count) => {
+      setUnreadNotifications(count);
+    });
+  }, [user]);
 
   const handleLogout = () => {
     dispatch(setUser({}));
@@ -54,64 +106,17 @@ export default function HeaderLinks() {
     >
       {/* <SearchBar mb={"unset"} me="10px" borderRadius="30px" /> */}
       <SidebarResponsive routes={routes} />
-      <Menu>
-        <MenuButton p="0px">
-          <Icon
-            mt="6px"
-            as={MdNotificationsNone}
-            color={navbarIcon}
-            w="18px"
-            h="18px"
-            me="10px"
-          />
-        </MenuButton>
-        <MenuList
-          boxShadow={shadow}
-          p="20px"
-          borderRadius="20px"
-          bg={menuBg}
-          border="none"
-          mt="22px"
-          me={{ base: "30px", md: "unset" }}
-          minW={{ base: "unset", md: "400px", xl: "450px" }}
-          maxW={{ base: "360px", md: "unset" }}
-        >
-          <Flex w="100%" mb="20px">
-            <Text fontSize="md" fontWeight="600" color={textColor}>
-              Notifications
-            </Text>
-            <Text
-              fontSize="sm"
-              fontWeight="500"
-              color={textColorBrand}
-              ms="auto"
-              cursor="pointer"
-            >
-              Mark all read
-            </Text>
-          </Flex>
-          <Flex flexDirection="column">
-            {/* <MenuItem
-              _hover={{ bg: "none" }}
-              _focus={{ bg: "none" }}
-              px="0"
-              borderRadius="8px"
-              mb="10px"
-            >
-              <ItemContent info="PhucDev UI Dashboard PRO" />
-            </MenuItem>
-            <MenuItem
-              _hover={{ bg: "none" }}
-              _focus={{ bg: "none" }}
-              px="0"
-              borderRadius="8px"
-              mb="10px"
-            >
-              <ItemContent info="PhucDev Design System Free" />
-            </MenuItem> */}
-          </Flex>
-        </MenuList>
-      </Menu>
+      <Center p="6px">
+        <Icon
+          as={MdNotificationsNone}
+          color={navbarIcon}
+          w="18px"
+          h="18px"
+          me="10px"
+          cursor={"pointer"}
+          onClick={() => navigate("/admin/notifications")}
+        />
+      </Center>
 
       <Menu>
         <MenuButton p="0px">
@@ -124,14 +129,7 @@ export default function HeaderLinks() {
             h="40px"
           />
         </MenuButton>
-        <MenuList
-          boxShadow={shadow}
-          p="0px"
-          mt="10px"
-          borderRadius="20px"
-          bg={menuBg}
-          border="none"
-        >
+        <MenuList boxShadow={shadow} p="0px" mt="10px" borderRadius="20px" bg={menuBg} border="none">
           <Flex w="100%" mb="0px">
             <Text
               ps="20px"
@@ -178,5 +176,5 @@ HeaderLinks.propTypes = {
   variant: PropTypes.string,
   fixed: PropTypes.bool,
   secondary: PropTypes.bool,
-  onOpen: PropTypes.func,
+  onOpen: PropTypes.func
 };

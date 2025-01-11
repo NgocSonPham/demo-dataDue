@@ -1,3 +1,4 @@
+import { firebaseAuthen } from "../utils/firebase";
 import dataServiceAxios from "./baseService";
 
 const authService = {
@@ -12,6 +13,21 @@ const authService = {
   },
   signInByGoogle: function (data: any) {
     return dataServiceAxios.post(`core/auth/signin/google`, data);
+  },
+  doFirebaseAuth: async function () {
+    try {
+      const {
+        data: { data: token }
+      } = await dataServiceAxios.get(`core/auth/firebase-token`);
+
+      const rs = await firebaseAuthen(token);
+      return {
+        auth: true,
+        db: rs.db
+      };
+    } catch (ex) {
+      return { auth: false };
+    }
   }
 };
 
