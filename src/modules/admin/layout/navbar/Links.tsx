@@ -72,7 +72,7 @@ export default function HeaderLinks() {
     const q = query(
       collection(db, "notification"),
       where("uid", "==", user.id.toString()),
-      where("read", "==", false),
+      where("seen", "==", false),
       where("createdAt", ">", Timestamp.fromMillis(user.seenNotificationAt))
     );
     const snapshot = await getCountFromServer(q);
