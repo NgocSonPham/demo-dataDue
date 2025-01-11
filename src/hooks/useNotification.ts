@@ -12,13 +12,13 @@ const useNotification = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+    if (typeof window !== "undefined") {
       try {
         const unsubscribe = onMessage(getMessaging(fcm), (payload) => {
           if (payload) {
-            const { data, fcmOptions, notification } = payload;
-
-            setNotification({ ...(data && { [data.type]: JSON.parse(data.value) }), ...fcmOptions, ...notification });
+            // const { data, fcmOptions, notification } = payload;
+            const { notification } = payload;
+            setNotification(notification);
           }
         });
         return () => unsubscribe();
