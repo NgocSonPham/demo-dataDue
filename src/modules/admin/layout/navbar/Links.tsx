@@ -21,7 +21,6 @@ import { selectUser, setUser } from "../../../../redux/slice";
 import { userFullnameOrUsername } from "../../../../utils/helpers";
 import routes from "../../routes";
 import { SidebarResponsive } from "../sidebar";
-import { ItemContent } from "./ItemContent";
 import React from "react";
 import { isEmpty } from "lodash";
 import { collection, getCountFromServer, query, Timestamp, where } from "firebase/firestore";
@@ -106,7 +105,7 @@ export default function HeaderLinks() {
     >
       {/* <SearchBar mb={"unset"} me="10px" borderRadius="30px" /> */}
       <SidebarResponsive routes={routes} />
-      <Center p="6px">
+      <Center p="6px" position={"relative"}>
         <Icon
           as={MdNotificationsNone}
           color={navbarIcon}
@@ -116,6 +115,20 @@ export default function HeaderLinks() {
           cursor={"pointer"}
           onClick={() => navigate("/admin/notifications")}
         />
+        <Center
+          h="14px"
+          bg="red.400"
+          borderRadius="50px"
+          position="absolute"
+          top="0"
+          right="2"
+          px="5px"
+          userSelect={"none"}
+        >
+          <Text w="full" fontSize="8px" color="white" fontWeight="700" textAlign={"center"}>
+            {unreadNotifications}
+          </Text>
+        </Center>
       </Center>
 
       <Menu>

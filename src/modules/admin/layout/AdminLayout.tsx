@@ -30,7 +30,7 @@ export default function AdminLayout(props: any) {
     if (isEmpty(user.permissions)) return;
 
     const finalRoutes = routes.filter((route) => {
-      return isHasPermission(user.permissions, route.resource);
+      return ["/notifications"].includes(route.path) || isHasPermission(user.permissions, route.resource);
     });
     setRoutesState(finalRoutes);
     getActiveRoute(finalRoutes);
