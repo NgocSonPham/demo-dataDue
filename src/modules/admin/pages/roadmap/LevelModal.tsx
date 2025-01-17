@@ -31,6 +31,7 @@ type FormType = {
   idx: number;
   thumbnail?: string;
   header?: string;
+  description?: string;
 };
 
 export default function LevelModal({
@@ -47,7 +48,7 @@ export default function LevelModal({
   const toast = useToast();
   const defaultValues = {
     ...data,
-    name: data?.name ?? `Level ${(course.levels?.length ?? 0) + 1}`,
+    name: data?.name ?? `Cấp độ ${(course.levels?.length ?? 0) + 1}`,
     idx: data?.idx ?? (course.levels?.length ?? 0) + 1
   };
 
@@ -102,7 +103,7 @@ export default function LevelModal({
           <ModalHeader>
             <HStack w="full" justify={"space-between"} align={"center"}>
               <Text fontSize={"20px"} fontWeight={600}>
-                {isEmpty(data) ? "Tạo mới node" : `Cập nhật ${data.name}`}
+                {isEmpty(data) ? "Tạo mới cấp độ" : `Cập nhật ${data.name}`}
               </Text>
               <ModalCloseButton rounded="full" border="1px" borderColor="gray.100" top="16px" right="24px" />
             </HStack>
@@ -115,7 +116,7 @@ export default function LevelModal({
                 rules={{ required: "Tên không được để trống" }}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <CustomInput
-                    label="Tên level"
+                    label="Tên cấp độ"
                     isRequired
                     disabled={true}
                     value={value}
@@ -160,6 +161,19 @@ export default function LevelModal({
                     value={value}
                     error={error}
                     onChange={(value) => onChange(value)}
+                  />
+                )}
+              />
+              <Controller
+                name="description"
+                control={control}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <CustomInput
+                    label="Mô tả cấp độ"
+                    isMultipleLines
+                    value={value}
+                    error={error}
+                    onTextChange={(value) => onChange(value)}
                   />
                 )}
               />

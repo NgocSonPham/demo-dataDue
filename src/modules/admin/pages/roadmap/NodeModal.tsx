@@ -31,6 +31,7 @@ import { getErrorMessage } from "../../../../utils/helpers";
 type FormType = {
   id?: number;
   name: string;
+  subtitle?: string;
   levelId: number;
   type: string;
   icon?: string;
@@ -120,6 +121,18 @@ export default function NodeModal({
                   <CustomInput
                     label="Tên node"
                     isRequired
+                    value={value}
+                    error={error}
+                    onTextChange={(value) => onChange(value)}
+                  />
+                )}
+              />
+              <Controller
+                name="subtitle"
+                control={control}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <CustomInput
+                    label="Phụ đề"
                     value={value}
                     error={error}
                     onTextChange={(value) => onChange(value)}

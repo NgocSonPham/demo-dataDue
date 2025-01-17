@@ -13,7 +13,7 @@ import NodeModal from "./NodeModal";
 import LevelModal from "./LevelModal";
 import courseService from "../../../../services/courseService";
 import CourseModal from "./CourseModal";
-import { isEmpty, set } from "lodash";
+import { isEmpty, remove, set } from "lodash";
 
 export default function RoadmapList() {
   const toast = useToast();
@@ -50,6 +50,33 @@ export default function RoadmapList() {
     onClose: onCloseDeleteQuestion
   } = useDisclosure();
 
+  const addQuery = (key?: string, value?: any) => {
+    // Parse existing query parameters
+    const searchParams = new URLSearchParams(location.search);
+
+    // Add new query parameter
+    searchParams.set(key, value);
+
+    // Update the URL without reloading
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+  };
+
+  const removeQuery = (key: string | string[]) => {
+    // Parse existing query parameters
+    const searchParams = new URLSearchParams(location.search);
+
+    if (Array.isArray(key)) {
+      // If key is an array, remove all specified keys
+      key.forEach((k) => searchParams.delete(k));
+    } else {
+      // If key is a string, remove the specified key
+      searchParams.delete(key);
+    }
+
+    // Update the URL while keeping history
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+  };
+
   const init = async () => {
     const { data: { data: list } = { data: {} } } = await specialityService.getAll();
     setSpecialityList(list.rows);
@@ -69,48 +96,101 @@ export default function RoadmapList() {
     init();
   }, []);
 
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const specialityId = searchParams.get("speciality");
+    if (specialityId) {
+      initSpeciality(parseInt(specialityId));
+    }
+  }, [specialityList]);
+
   const initSpeciality = async (id: number) => {
     // const { data: { data } = { data: {} } } = await specialityService.getById(id);
+    if (isEmpty(specialityList)) return;
     const data = specialityList.find((item: any) => item.id === id);
     setSpecialitySelected(data);
     initCourses(data.id);
+    addQuery("speciality", data.id);
+
+    const searchParams = new URLSearchParams(location.search);
+    const courseId = searchParams.get("course");
+    if (courseId) {
+      initCourse(parseInt(courseId));
+    } else removeQuery("course");
   };
 
   const initCourse = async (id: number) => {
     const { data: { data } = { data: {} } } = await courseService.getById(id);
     // const data = courseList.find((item: any) => item.id === id);
     setCourseSelected(data);
+
+    setLevelSelected(null);
+    setRoadmapList([]);
+    setQuestionList([]);
+
+    addQuery("course", id);
+
+    const searchParams = new URLSearchParams(location.search);
+    const levelId = searchParams.get("level");
+    if (levelId) {
+      const level = data.levels.find((item: any) => item.id === parseInt(levelId));
+      initRoadmap(level, id);
+    } else removeQuery("level");
   };
 
-  const initRoadmap = async (level: any) => {
+  const initRoadmap = async (level: any, courseId?: number) => {
     const { data: { data: list } = { data: {} } } = await roadmapService.getAll({
-      courseId: courseSelected.id,
+      courseId: courseId ?? courseSelected.id,
       levelId: level.id
     });
     setLevelSelected(level);
     setRoadmapList(list.rows);
     setQuestionList([]);
-  };
+    addQuery("level", level.id);
 
-  const initLesson = async (lessonId: any) => {
-    setLessonSelected(lessonList.find((item: any) => item.id === lessonId));
-    const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestions(roadmapSelected.id, {
-      lessonId
-    });
-    setQuestionList(list.rows);
+    const searchParams = new URLSearchParams(location.search);
+    const roadmapId = searchParams.get("roadmap");
+    if (roadmapId) {
+      const roadmap = list.rows.find((item: any) => item.id === parseInt(roadmapId));
+      initRoadmapQuestions(roadmap);
+    } else removeQuery("roadmap");
   };
 
   const initRoadmapQuestions = async (roadmap: any) => {
     setRoadmapSelected(roadmap);
     setLessonSelected({});
+    addQuery("roadmap", roadmap.id);
+
+    let lessonList = [];
     if (["practice", "final-test"].includes(roadmap.type)) {
       const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestions(roadmap.id);
       setQuestionList(list.rows);
+      lessonList = list.rows;
     } else {
       const { data: { data: list } = { data: {} } } = await roadmapService.getAllLessons(roadmap.id);
       setLessonList(list.rows);
       setQuestionList([]);
+      lessonList = list.rows;
     }
+
+    const searchParams = new URLSearchParams(location.search);
+    const lessonId = searchParams.get("lesson");
+    if (lessonId) {
+      const lesson = lessonList.find((item: any) => item.id === parseInt(lessonId));
+      initLesson(lesson, roadmap.id);
+    } else removeQuery("lesson");
+  };
+
+  const initLesson = async (lesson: any, roadmapId?: number) => {
+    setLessonSelected(lesson);
+    const { data: { data: list } = { data: {} } } = await roadmapService.getAllQuestions(
+      roadmapId ?? roadmapSelected.id,
+      {
+        lessonId: lesson.id
+      }
+    );
+    setQuestionList(list.rows);
+    addQuery("lesson", lesson.id);
   };
 
   const handleSelectSpeciality = (id: number) => {
@@ -120,6 +200,10 @@ export default function RoadmapList() {
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
+
+    removeQuery("level");
+    removeQuery("roadmap");
+    removeQuery("lesson");
   };
 
   const handleUnSelectSpeciality = () => {
@@ -128,14 +212,19 @@ export default function RoadmapList() {
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
+    removeQuery("speciality");
+    removeQuery("course");
+    removeQuery("level");
+    removeQuery("roadmap");
+    removeQuery("lesson");
   };
 
   const handleSelectCourse = (id: number) => {
     if (isNaN(id)) return;
     initCourse(id);
-    setLevelSelected(null);
-    setRoadmapList([]);
-    setQuestionList([]);
+
+    removeQuery("roadmap");
+    removeQuery("lesson");
   };
 
   const handleUnSelectCourse = () => {
@@ -143,6 +232,10 @@ export default function RoadmapList() {
     setLevelSelected(null);
     setRoadmapList([]);
     setQuestionList([]);
+    removeQuery("course");
+    removeQuery("level");
+    removeQuery("roadmap");
+    removeQuery("lesson");
   };
 
   const handleAddCourse = async () => {
@@ -176,6 +269,11 @@ export default function RoadmapList() {
         render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
       });
     }
+  };
+
+  const handleSelectLevel = (item: any) => {
+    initRoadmap(item);
+    removeQuery("lesson");
   };
 
   const handleAddLevel = async () => {
@@ -266,14 +364,15 @@ export default function RoadmapList() {
 
   const handleSelectLesson = (id: number) => {
     if (isNaN(id)) return;
-    initLesson(id);
-    setQuestionList([]);
+    const lesson = lessonList.find((item: any) => item.id === id);
+    initLesson(lesson);
   };
 
   const handleUnSelectLesson = () => {
     setLessonSelected({});
     setLessonSelected(null);
     setQuestionList([]);
+    removeQuery("lesson");
   };
 
   const handleDeleteLesson = async (obj: any) => {
@@ -380,7 +479,7 @@ export default function RoadmapList() {
             </Button>
             {courseSelected?.levels?.map((item: any) => (
               <Flex key={item.id} w="full" align="center" gap="10px">
-                <Button variant={"brand"} w="full" bg={"brand.900"} onClick={() => initRoadmap(item)}>
+                <Button variant={"brand"} w="full" bg={"brand.900"} onClick={() => handleSelectLevel(item)}>
                   {item.name}
                 </Button>
                 <EditIcon
@@ -482,7 +581,9 @@ export default function RoadmapList() {
             w="full"
             border={"1px dashed"}
             onClick={() => {
-              navigate(`/admin/roadmaps/${roadmapSelected.id}/questions/new${lessonSelected ? `?lessonId=${lessonSelected.id}` : ""}`);
+              navigate(
+                `/admin/roadmaps/${roadmapSelected.id}/questions/new${lessonSelected ? `?lessonId=${lessonSelected.id}` : ""}`
+              );
             }}
           >
             {"Thêm câu hỏi"}

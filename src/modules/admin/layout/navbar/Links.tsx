@@ -115,20 +115,22 @@ export default function HeaderLinks() {
           cursor={"pointer"}
           onClick={() => navigate("/admin/notifications")}
         />
-        <Center
-          h="14px"
-          bg="red.400"
-          borderRadius="50px"
-          position="absolute"
-          top="0"
-          right="2"
-          px="5px"
-          userSelect={"none"}
-        >
-          <Text w="full" fontSize="8px" color="white" fontWeight="700" textAlign={"center"}>
-            {unreadNotifications}
-          </Text>
-        </Center>
+        {unreadNotifications > 0 && (
+          <Center
+            h="14px"
+            bg="red.400"
+            borderRadius="50px"
+            position="absolute"
+            top="0"
+            right="2"
+            px="5px"
+            userSelect={"none"}
+          >
+            <Text w="full" fontSize="8px" color="white" fontWeight="700" textAlign={"center"}>
+              {unreadNotifications}
+            </Text>
+          </Center>
+        )}
       </Center>
 
       <Menu>
