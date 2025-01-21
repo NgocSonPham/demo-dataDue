@@ -69,7 +69,18 @@ export default function CustomUploadButton({
           return;
         }
         // console.log("selectedFile", selectedFile);
-        if (!["image/png", "image/jpg", "image/jpeg", "image/webp"].includes(selectedFile.type)) {
+        if (
+          ![
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/heic",
+            "image/svg",
+            "image/heif"
+          ].includes(selectedFile.type)
+        ) {
           toast({
             position: "top-right",
             render: ({ onClose }) => (
