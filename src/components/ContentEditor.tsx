@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import RichTextEditor, {
   BaseKit,
@@ -40,8 +40,8 @@ import RichTextEditor, {
   Underline,
   locale
 } from "reactjs-tiptap-editor";
-
 import "reactjs-tiptap-editor/style.css";
+import uploadService from "../services/uploadService";
 
 const extensions = [
   BaseKit.configure({
@@ -83,11 +83,45 @@ const extensions = [
   Link,
   Image,
   ImageUpload.configure({
-    upload: (files: File) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(URL.createObjectURL(files));
-        }, 500);
+    upload: (file: File) => {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+
+        if (file.size > 5 * 1024 * 1024) {
+          reject(new Error("File size must be less than 5MB."));
+          return;
+        }
+
+        if (
+          ![
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/heic",
+            "image/svg",
+            "image/heif"
+          ].includes(file.type)
+        ) {
+          reject(new Error("File type must be png, jpg or jpeg."));
+          return;
+        }
+        formData.append("files", file);
+
+        uploadService
+          .upload(formData)
+          .then((res) => {
+            const { data: { data: uploaded } = { data: {} } } = res;
+            if (uploaded) {
+              resolve(uploaded?.[0] ?? "");
+            } else {
+              reject(new Error("Upload failed! No data returned."));
+            }
+          })
+          .catch((err) => {
+            reject(err?.response?.data?.message ?? "Upload failed!");
+          });
       });
     }
   }),
