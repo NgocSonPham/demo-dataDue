@@ -1,15 +1,15 @@
+import dayjs from "dayjs";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { isEmpty } from "lodash";
 import React from "react";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { selectUser, setConfig, setUser } from "../redux/slice";
-import configService from "../services/configService";
-import userService from "../services/userService";
-import authService from "../services/authService";
-import { db } from "../utils/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import dayjs from "dayjs";
 import useFcmToken from "../hooks/useFcmToken";
+import { selectUser, setConfig, setSpecialities, setUser } from "../redux/slice";
+import authService from "../services/authService";
+import specialityService from "../services/specialityService";
+import userService from "../services/userService";
+import { db } from "../utils/firebase";
 
 const ReloadState = () => {
   const user = useAppSelector(selectUser);
@@ -17,11 +17,11 @@ const ReloadState = () => {
   const [loaded, setLoaded] = React.useState(false);
   const { fcmToken } = useFcmToken();
 
-  const initConfig = async () => {
+  const initSpecialities = async () => {
     const {
-      data: { data: config }
-    } = await configService.getConfig();
-    dispatch(setConfig(config));
+      data: { data: list }
+    } = await specialityService.getAll();
+    dispatch(setSpecialities(list.rows));
   };
 
   React.useEffect(() => {
@@ -40,7 +40,7 @@ const ReloadState = () => {
     if (!isEmpty(user?.id?.toString())) {
       initUser();
     }
-    // initConfig();
+    initSpecialities();
   }, []);
 
   React.useEffect(() => {

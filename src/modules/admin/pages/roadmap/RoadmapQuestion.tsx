@@ -1,5 +1,20 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Button, Flex, FormControl, FormErrorMessage, Heading, HStack, Text, useToast, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  Heading,
+  HStack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  useToast,
+  VStack
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
@@ -16,6 +31,7 @@ import { getErrorMessage } from "../../../../utils/helpers";
 import { countBoldItalicTexts } from "./CountAnswers";
 import ListOfChoices from "./ListOfChoices";
 import SanboxOfQuestion from "./SanboxOfQuestion";
+import RoadmapQuestionTranscript from "./RoadmapQuestionTranscript";
 
 type FormType = {
   id?: number;
@@ -30,6 +46,7 @@ type FormType = {
   guide?: string;
   exp?: number;
   nut?: number;
+  transcripts: any[];
 };
 
 export default function RoadmapQuestion() {
@@ -56,6 +73,7 @@ export default function RoadmapQuestion() {
     if (questionId !== "new") {
       roadmapService.getByQuestionId(id, questionId).then((res) => {
         const { data: { data: questionData = { data: {} } } = { data: {} } } = res;
+        
         reset(questionData);
       });
     }
@@ -98,6 +116,35 @@ export default function RoadmapQuestion() {
   const save: SubmitHandler<FormType> = async (data) => {
     mutate(data);
   };
+
+  const handleChangeTranscripts = (transcriptId: number, value: number) => {
+    const transcripts = watch("transcripts");
+    
+    // if transcriptId is not exist in transcripts, add new transcript
+    const isExist = transcripts?.some((item: any) => item.transcriptId === transcriptId);
+    if (!isExist) {
+      const newTranscript = {
+        transcriptId,
+        value
+      };
+      setValue("transcripts", [...(transcripts ?? []), newTranscript]);
+      return;
+    }
+
+    // if transcriptId is exist in transcripts, update value of transcript
+    const updatedTranscripts = transcripts.map((item: any) => {
+      if (item.transcriptId === transcriptId) {
+        return {
+          ...item,
+          value
+        };
+      }
+      return item;
+    });
+    
+    setValue("transcripts", updatedTranscripts);
+  };
+
   return (
     <CustomCard flexDirection="column" w="100%" minH="83vh" px="20px" overflowX={{ sm: "scroll", lg: "hidden" }}>
       <HStack w="full" spacing={4} mb={"20px"}>
@@ -117,259 +164,277 @@ export default function RoadmapQuestion() {
           {"Save"}
         </Button>
       </HStack>
-      <VStack spacing={4} align="flex-start">
-        <HStack w="full" justify="space-between" align={"stretch"} gap="20px">
-          <VStack w="50%" spacing={4} align="flex-start">
-            <Controller
-              name="title"
-              control={control}
-              rules={{ required: "Câu hỏi không được để trống" }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <CustomInput
-                  label="Câu hỏi"
-                  isRequired
-                  value={value}
-                  error={error}
-                  onTextChange={(value) => onChange(value)}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="type"
-              rules={{ required: "Loại không được để trống" }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <FormControl isInvalid={!!error}>
-                  <CustomSelect
-                    w="full"
-                    placeholder="Chọn loại.."
-                    allowAddNew={false}
-                    name={"type"}
-                    value={[value]}
-                    options={[
-                      {
-                        label: "Hot spot",
-                        value: "hot-spot"
-                      },
-                      {
-                        label: "Snippet",
-                        value: "snippet"
-                      },
-                      {
-                        label: "Multi choices",
-                        value: "multi-choices"
-                      },
-                      {
-                        label: "Single choice",
-                        value: "single-choice"
-                      },
-                      {
-                        label: "Drag & Drop",
-                        value: "drag-drop"
-                      }
-                    ]}
-                    onSelected={(value) => {
-                      onChange(value[0]);
-                      if (["multi-choices", "single-choice", "drag-drop"].includes(value[0])) setValue("answer", []);
-                    }}
+      <Tabs>
+        <TabList>
+          <Tab>Nội dung câu hỏi</Tab>
+          <Tab>Bảng điểm</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <VStack spacing={4} align="flex-start">
+              <HStack w="full" justify="space-between" align={"stretch"} gap="20px">
+                <VStack w="50%" spacing={4} align="flex-start">
+                  <Controller
+                    name="title"
+                    control={control}
+                    rules={{ required: "Câu hỏi không được để trống" }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInput
+                        label="Câu hỏi"
+                        isRequired
+                        value={value}
+                        error={error}
+                        onTextChange={(value) => onChange(value)}
+                      />
+                    )}
                   />
+                  <Controller
+                    control={control}
+                    name="type"
+                    rules={{ required: "Loại không được để trống" }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <FormControl isInvalid={!!error}>
+                        <CustomSelect
+                          w="full"
+                          placeholder="Chọn loại.."
+                          allowAddNew={false}
+                          name={"type"}
+                          value={[value]}
+                          options={[
+                            {
+                              label: "Hot spot",
+                              value: "hot-spot"
+                            },
+                            {
+                              label: "Snippet",
+                              value: "snippet"
+                            },
+                            {
+                              label: "Multi choices",
+                              value: "multi-choices"
+                            },
+                            {
+                              label: "Single choice",
+                              value: "single-choice"
+                            },
+                            {
+                              label: "Drag & Drop",
+                              value: "drag-drop"
+                            }
+                          ]}
+                          onSelected={(value) => {
+                            onChange(value[0]);
+                            if (["multi-choices", "single-choice", "drag-drop"].includes(value[0]))
+                              setValue("answer", []);
+                          }}
+                        />
 
-                  {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-                </FormControl>
-              )}
-            />
-            <Controller
-              name="idx"
-              control={control}
-              rules={{ required: "Thứ tự không được để trống" }}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <CustomInputNumber
-                  label="Thứ tự"
-                  isRequired
-                  value={value}
-                  error={error}
-                  onChange={(value) => onChange(value)}
-                />
-              )}
-            />
-          </VStack>
-          <VStack w="50%" align={"start"}>
-            <Text fontSize={"16px"} fontWeight={600} w="full">
-              {"Phần thưởng"}
-            </Text>
-            <Controller
-              name="exp"
-              control={control}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <CustomInputNumber
-                  label="Kinh nghiệm"
-                  isRequired
-                  value={value ?? 0}
-                  error={error}
-                  onChange={(value) => onChange(value)}
-                />
-              )}
-            />
-            <Controller
-              name="nut"
-              control={control}
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <CustomInputNumber
-                  label="Hạt dẻ"
-                  isRequired
-                  value={value ?? 0}
-                  error={error}
-                  onChange={(value) => onChange(value)}
-                />
-              )}
-            />
-          </VStack>
-        </HStack>
-
-        <VStack w="full" align="flex-start" spacing={1}>
-          <Text fontWeight={"bold"}>{"Mô tả câu hỏi"}</Text>
-          {(questionId === "new" || (questionId != "new" && !isEmpty(watch("description")))) && (
-            <Controller
-              control={control}
-              name="description"
-              render={({ field: { onChange, value }, fieldState: { error } }) => (
-                <FormControl isInvalid={!!error} id="description">
-                  <ContentEditor type={"html"} content={value} onChange={onChange} />
-
-                  {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-                </FormControl>
-              )}
-            />
-          )}
-        </VStack>
-
-        {questionType === "hot-spot" && (
-          <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>{"Mô tả câu trả lời"}</Text>
-            <VStack w="full" align="flex-start" spacing={1}>
-              <Text>{"Đáp án"}</Text>
-              <Controller
-                control={control}
-                name="answer"
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <FormControl isInvalid={!!error} id="answer">
-                    <ContentEditor type={"json"} content={value} onChange={onChange} />
-
-                    {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-                  </FormControl>
-                )}
-              />
-            </VStack>
-            <VStack w="full" align="flex-start" spacing={1}>
-              <Text>{"Danh sách lựa chọn"}</Text>
-              {Array.from({ length: !isEmpty(answer) ? countBoldItalicTexts(answer.content) : 0 }, (_, index) => (
-                <Flex key={index} w="full" align="center" gap="10px">
-                  <CustomSelect
-                    w="full"
-                    placeholder={`Chọn danh sách câu trả lời cho lỗ trống ${index + 1}..`}
-                    multiple
-                    name={`answerChoices-${index}`}
-                    value={answerChoices?.[index]}
-                    options={
-                      !isEmpty(answerChoices)
-                        ? answerChoices?.[index]?.map((item: string) => ({
-                            label: item,
-                            value: item
-                          }))
-                        : []
-                    }
-                    onSelected={(value) => onChangeAnswerChoices(value, index)}
+                        {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                      </FormControl>
+                    )}
                   />
-                </Flex>
-              ))}
-            </VStack>
-          </VStack>
-        )}
+                  <Controller
+                    name="idx"
+                    control={control}
+                    rules={{ required: "Thứ tự không được để trống" }}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInputNumber
+                        label="Thứ tự"
+                        isRequired
+                        value={value}
+                        error={error}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                </VStack>
+                <VStack w="50%" align={"start"}>
+                  <Text fontSize={"16px"} fontWeight={600} w="full">
+                    {"Phần thưởng"}
+                  </Text>
+                  <Controller
+                    name="exp"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInputNumber
+                        label="Kinh nghiệm"
+                        isRequired
+                        value={value ?? 0}
+                        error={error}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="nut"
+                    control={control}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <CustomInputNumber
+                        label="Hạt dẻ"
+                        isRequired
+                        value={value ?? 0}
+                        error={error}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                </VStack>
+              </HStack>
 
-        {questionType === "snippet" && (
-          <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>{"Sandbox"}</Text>
-            <SanboxOfQuestion sandbox={watch("sandbox") ?? []} onUpdateSanbox={(data) => setValue("sandbox", data)} />
-            <Text fontWeight={"bold"} pt="20px">
-              {"Mô tả câu trả lời"}
-            </Text>
-            <VStack w="full" align="flex-start" spacing={1}>
-              <Text>{"Đáp án"}</Text>
-              <Controller
-                control={control}
-                name="answer"
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <FormControl isInvalid={!!error} id="answer">
-                    <ContentEditor type={"json"} content={value} onChange={onChange} />
+              <VStack w="full" align="flex-start" spacing={1}>
+                <Text fontWeight={"bold"}>{"Mô tả câu hỏi"}</Text>
+                {(questionId === "new" || (questionId != "new" && !isEmpty(watch("description")))) && (
+                  <Controller
+                    control={control}
+                    name="description"
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <FormControl isInvalid={!!error} id="description">
+                        <ContentEditor type={"html"} content={value} onChange={onChange} />
 
-                    {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
-                  </FormControl>
+                        {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                      </FormControl>
+                    )}
+                  />
                 )}
-              />
+              </VStack>
+
+              {questionType === "hot-spot" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>{"Mô tả câu trả lời"}</Text>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Đáp án"}</Text>
+                    <Controller
+                      control={control}
+                      name="answer"
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <FormControl isInvalid={!!error} id="answer">
+                          <ContentEditor type={"json"} content={value} onChange={onChange} />
+
+                          {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                        </FormControl>
+                      )}
+                    />
+                  </VStack>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Danh sách lựa chọn"}</Text>
+                    {Array.from({ length: !isEmpty(answer) ? countBoldItalicTexts(answer.content) : 0 }, (_, index) => (
+                      <Flex key={index} w="full" align="center" gap="10px">
+                        <CustomSelect
+                          w="full"
+                          placeholder={`Chọn danh sách câu trả lời cho lỗ trống ${index + 1}..`}
+                          multiple
+                          name={`answerChoices-${index}`}
+                          value={answerChoices?.[index]}
+                          options={
+                            !isEmpty(answerChoices)
+                              ? answerChoices?.[index]?.map((item: string) => ({
+                                  label: item,
+                                  value: item
+                                }))
+                              : []
+                          }
+                          onSelected={(value) => onChangeAnswerChoices(value, index)}
+                        />
+                      </Flex>
+                    ))}
+                  </VStack>
+                </VStack>
+              )}
+
+              {questionType === "snippet" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>{"Sandbox"}</Text>
+                  <SanboxOfQuestion
+                    sandbox={watch("sandbox") ?? []}
+                    onUpdateSanbox={(data) => setValue("sandbox", data)}
+                  />
+                  <Text fontWeight={"bold"} pt="20px">
+                    {"Mô tả câu trả lời"}
+                  </Text>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Đáp án"}</Text>
+                    <Controller
+                      control={control}
+                      name="answer"
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <FormControl isInvalid={!!error} id="answer">
+                          <ContentEditor type={"json"} content={value} onChange={onChange} />
+
+                          {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+                        </FormControl>
+                      )}
+                    />
+                  </VStack>
+                  <VStack w="full" align="flex-start" spacing={1}>
+                    <Text>{"Danh sách lựa chọn"}</Text>
+                    <ListOfChoices
+                      choices={answerChoices ?? []}
+                      rightChoices={[]}
+                      disableChooseRightChoices={true}
+                      haveArrangement={true}
+                      onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                      onUpdateRightChoices={() => {}}
+                    />
+                  </VStack>
+                </VStack>
+              )}
+
+              {questionType === "multi-choices" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>{"Danh sách câu trả lời"}</Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    isMultiChoices={true}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
+                </VStack>
+              )}
+
+              {questionType === "single-choice" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>
+                    {"Danh sách câu trả lời"}
+                    <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
+                      {"(Chỉ chọn 1 câu trả lời đúng)"}
+                    </Text>
+                  </Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
+                </VStack>
+              )}
+
+              {questionType === "drag-drop" && (
+                <VStack w="full" align="flex-start" spacing={2}>
+                  <Text fontWeight={"bold"}>
+                    {"Danh sách câu trả lời"}
+                    <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
+                      {"(Kéo thả để sắp xếp thứ tự đúng)"}
+                    </Text>
+                  </Text>
+                  <ListOfChoices
+                    choices={answerChoices ?? []}
+                    rightChoices={answer ?? []}
+                    haveArrangement={true}
+                    isMultiChoices={true}
+                    onUpdateChoices={(choices) => setValue("answerChoices", choices)}
+                    onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
+                  />
+                </VStack>
+              )}
             </VStack>
-            <VStack w="full" align="flex-start" spacing={1}>
-              <Text>{"Danh sách lựa chọn"}</Text>
-              <ListOfChoices
-                choices={answerChoices ?? []}
-                rightChoices={[]}
-                disableChooseRightChoices={true}
-                haveArrangement={true}
-                onUpdateChoices={(choices) => setValue("answerChoices", choices)}
-                onUpdateRightChoices={() => {}}
-              />
-            </VStack>
-          </VStack>
-        )}
-
-        {questionType === "multi-choices" && (
-          <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>{"Danh sách câu trả lời"}</Text>
-            <ListOfChoices
-              choices={answerChoices ?? []}
-              rightChoices={answer ?? []}
-              isMultiChoices={true}
-              onUpdateChoices={(choices) => setValue("answerChoices", choices)}
-              onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
-            />
-          </VStack>
-        )}
-
-        {questionType === "single-choice" && (
-          <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>
-              {"Danh sách câu trả lời"}
-              <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
-                {"(Chỉ chọn 1 câu trả lời đúng)"}
-              </Text>
-            </Text>
-            <ListOfChoices
-              choices={answerChoices ?? []}
-              rightChoices={answer ?? []}
-              onUpdateChoices={(choices) => setValue("answerChoices", choices)}
-              onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
-            />
-          </VStack>
-        )}
-
-        {questionType === "drag-drop" && (
-          <VStack w="full" align="flex-start" spacing={2}>
-            <Text fontWeight={"bold"}>
-              {"Danh sách câu trả lời"}
-              <Text as="span" fontSize={"sm"} fontWeight={"normal"} pl="10px">
-                {"(Kéo thả để sắp xếp thứ tự đúng)"}
-              </Text>
-            </Text>
-            <ListOfChoices
-              choices={answerChoices ?? []}
-              rightChoices={answer ?? []}
-              haveArrangement={true}
-              isMultiChoices={true}
-              onUpdateChoices={(choices) => setValue("answerChoices", choices)}
-              onUpdateRightChoices={(rightChoices) => setValue("answer", rightChoices)}
-            />
-          </VStack>
-        )}
-      </VStack>
+          </TabPanel>
+          <TabPanel>
+            <RoadmapQuestionTranscript transtripts={watch("transcripts")} onChange={handleChangeTranscripts} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </CustomCard>
   );
 }

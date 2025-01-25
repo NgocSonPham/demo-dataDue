@@ -1,25 +1,28 @@
 import { DeleteIcon, EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, HStack, Icon, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, HStack, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { isEmpty } from "lodash";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
 import CustomConfirmAlert from "../../../../components/CustomConfirmAlert";
 import CustomSelect from "../../../../components/CustomSelect";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
+import { selectSpecialities } from "../../../../redux/slice";
+import courseService from "../../../../services/courseService";
 import roadmapService from "../../../../services/roadmapService";
 import specialityService from "../../../../services/specialityService";
 import { getErrorMessage } from "../../../../utils/helpers";
-import NodeModal from "./NodeModal";
-import LevelModal from "./LevelModal";
-import courseService from "../../../../services/courseService";
 import CourseModal from "./CourseModal";
-import { isEmpty, remove, set } from "lodash";
+import LevelModal from "./LevelModal";
+import NodeModal from "./NodeModal";
 
 export default function RoadmapList() {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const [specialityList, setSpecialityList] = React.useState([]);
+  const specialityList = useAppSelector(selectSpecialities);
+
   const [specialitySelected, setSpecialitySelected] = React.useState<any>();
 
   const [courseList, setCourseList] = React.useState([]);
@@ -77,11 +80,6 @@ export default function RoadmapList() {
     navigate(`${location.pathname}?${searchParams.toString()}`);
   };
 
-  const init = async () => {
-    const { data: { data: list } = { data: {} } } = await specialityService.getAll();
-    setSpecialityList(list.rows);
-  };
-
   const initCourses = async (specialityId: number) => {
     const { data: { data: list } = { data: {} } } = await specialityService.getAllCourses(specialityId);
     setCourseList(list);
@@ -91,10 +89,6 @@ export default function RoadmapList() {
     const { data: { data: list } = { data: {} } } = await roadmapService.getAllLessons(roadmapId);
     setLessonList(list);
   };
-
-  React.useEffect(() => {
-    init();
-  }, []);
 
   React.useEffect(() => {
     const searchParams = new URLSearchParams(location.search);

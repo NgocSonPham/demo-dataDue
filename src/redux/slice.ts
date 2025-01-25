@@ -5,10 +5,11 @@ import { RootState } from "./store";
 type AppState = {
   user: User;
   config: any;
+  specialities: any;
 };
 
 const initialState = {
-  user: {},
+  user: {}
 } as AppState;
 
 const appSlice = createSlice({
@@ -21,10 +22,14 @@ const appSlice = createSlice({
     setConfig: (state, action: PayloadAction<any>) => {
       state.config = action.payload;
     },
-  },
+    setSpecialities: (state, action: PayloadAction<any>) => {
+      state.specialities = action.payload;
+    }
+  }
 });
 
-export const { setUser, setConfig } = appSlice.actions;
+export const { setUser, setConfig, setSpecialities } = appSlice.actions;
 export const selectUser = (state: RootState) => state.app.user;
 export const selectConfig = (state: RootState) => state.app.config;
+export const selectSpecialities = (state: RootState) => state.app.specialities;
 export default appSlice.reducer;
