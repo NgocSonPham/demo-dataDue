@@ -21,6 +21,18 @@ const postService = {
   },
   delete: function (id: number) {
     return dataServiceAxios.delete(`core/posts/${id}`);
+  },
+  deletePermanently: function (id: number) {
+    return dataServiceAxios.delete(`core/posts/${id}?hardDelete=true`);
+  },
+  publish: function (id: number) {
+    return dataServiceAxios.post(`core/posts/${id}/publish`);
+  },
+  approve: function (id: number) {
+    return dataServiceAxios.post(`core/posts/${id}/approve`);
+  },
+  disapprove: function (id: number) {
+    return dataServiceAxios.post(`core/posts/${id}/disapprove`);
   }
 };
 
