@@ -283,7 +283,13 @@ export default function PostList() {
         </Button>
       </Flex>
 
-      <Table variant="simple" color="gray.500" w="full" layout="fixed" sx={{ th: { p: "6px" }, td: { p: "6px" } }}>
+      <Table
+        variant="simple"
+        color="gray.500"
+        w="full"
+        layout="fixed"
+        sx={{ th: { p: "10px" }, td: { px: "6px", py: "8px" } }}
+      >
         <Thead>
           <Tr>
             <Th
@@ -292,8 +298,7 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              w="80px"
-              px="10px"
+              w="60px"
             >
               ID
             </Th>
@@ -303,7 +308,6 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              px="10px"
             >
               Tên
             </Th>
@@ -316,7 +320,6 @@ export default function PostList() {
               w="120px"
               maxW="120px"
               minW="100px"
-              px="10px"
             >
               Main Cat
             </Th>
@@ -329,7 +332,6 @@ export default function PostList() {
               w="120px"
               maxW="120px"
               minW="100px"
-              px="10px"
             >
               Sub Cat
             </Th>
@@ -342,7 +344,6 @@ export default function PostList() {
               w="160px"
               maxW="160px"
               minW="100px"
-              px="10px"
             >
               Topics
             </Th>
@@ -352,8 +353,7 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              px="10px"
-              w="140px"
+              w="110px"
             >
               Trạng thái
             </Th>
@@ -363,8 +363,7 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              px="10px"
-              w="140px"
+              w="120px"
               minW="140px"
             >
               Người tạo
@@ -375,12 +374,11 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              px="10px"
               w="100px"
             >
               Ngày tạo
             </Th>
-            <Th borderColor={borderColor} cursor="pointer" w="100px" maxW="100px" minW="0px" px="10px" />
+            <Th borderColor={borderColor} cursor="pointer" w="100px" maxW="100px" minW="0px" />
           </Tr>
         </Thead>
         <Tbody>
