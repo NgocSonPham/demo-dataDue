@@ -26,7 +26,7 @@ import dayjs from "dayjs";
 import React from "react";
 import { FaPlus } from "react-icons/fa6";
 import { IoTrashBin } from "react-icons/io5";
-import { MdCheckCircle, MdOutlinePublic, MdOutlinePublicOff } from "react-icons/md";
+import { MdCancel, MdCheckCircle, MdOutlinePublic, MdOutlinePublicOff } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
@@ -171,9 +171,39 @@ export default function PostList() {
     }
   };
 
+  const confirmUnPublish = async (id: number) => {
+    try {
+      const { data: { data: _updated } = { data: {} } } = await postService.unPublish(id);
+
+      init();
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
+      });
+    }
+  };
+
   const confirmApprove = async (id: number) => {
     try {
       const { data: { data: _updated } = { data: {} } } = await postService.approve(id);
+
+      init();
+    } catch (error) {
+      const message = getErrorMessage(error);
+
+      toast({
+        position: "top-right",
+        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
+      });
+    }
+  };
+
+  const confirmReject = async (id: number) => {
+    try {
+      const { data: { data: _updated } = { data: {} } } = await postService.reject(id);
 
       init();
     } catch (error) {
@@ -429,14 +459,6 @@ export default function PostList() {
                             cursor={"pointer"}
                             onClick={() => handleDelete(row)}
                           />
-                          {/* <Icon
-                              as={MdOutlinePublic}
-                              color="blue.500"
-                              w="15px"
-                              h="15px"
-                              cursor={"pointer"}
-                              onClick={() => handleDelete(row)}
-                            /> */}
                           <CustomConfirmIconButton
                             title={`Publish ${row.title}`}
                             question={"Are you sure to publish this Post?"}
@@ -448,35 +470,37 @@ export default function PostList() {
                         </>
                       )}
                       {row.status === "pending" && user.roleId === USER_ROLE.ADMIN && (
-                        // <Icon
-                        //   as={MdCheckCircle}
-                        //   color="green.500"
-                        //   w="15px"
-                        //   h="15px"
-                        //   cursor={"pointer"}
-                        //   onClick={() => handleDelete(row)}
-                        // />
-                        <CustomConfirmIconButton
-                          title={`Approve ${row.title}`}
-                          question={"Are you sure to approve this Post?"}
-                          icon={MdCheckCircle}
-                          color="green.500"
-                          data={row}
-                          onConfirm={() => confirmApprove(row.id)}
-                        />
+                        <>
+                          <CustomConfirmIconButton
+                            title={`Revert publish ${row.title}`}
+                            question={"Are you sure to revert publish this Post?"}
+                            icon={MdOutlinePublicOff}
+                            color="orange.500"
+                            data={row}
+                            onConfirm={() => confirmUnPublish(row.id)}
+                          />
+                          <CustomConfirmIconButton
+                            title={`Approve ${row.title}`}
+                            question={"Are you sure to approve this Post?"}
+                            icon={MdCheckCircle}
+                            color="green.500"
+                            data={row}
+                            onConfirm={() => confirmApprove(row.id)}
+                          />
+                          <CustomConfirmIconButton
+                            title={`Reject ${row.title}`}
+                            question={"Are you sure to reject this Post?"}
+                            icon={MdCancel}
+                            color="red.500"
+                            data={row}
+                            onConfirm={() => confirmReject(row.id)}
+                          />
+                        </>
                       )}
                       {row.status === "published" && user.roleId === USER_ROLE.ADMIN && (
-                        // <Icon
-                        //   as={MdOutlinePublicOff}
-                        //   color="orange.500"
-                        //   w="15px"
-                        //   h="15px"
-                        //   cursor={"pointer"}
-                        //   onClick={() => handleDelete(row)}
-                        // />
                         <CustomConfirmIconButton
                           title={`Disapprove ${row.title}`}
-                          question={"Are you sure to disapprove this Post?"}
+                          question={"Are you sure to make this Post private?"}
                           icon={MdOutlinePublicOff}
                           color="orange.500"
                           data={row}
@@ -484,14 +508,6 @@ export default function PostList() {
                         />
                       )}
                       {row.status === "deleted" && user.roleId === USER_ROLE.ADMIN && (
-                        // <Icon
-                        //   as={IoTrashBin}
-                        //   color="black"
-                        //   w="15px"
-                        //   h="15px"
-                        //   cursor={"pointer"}
-                        //   onClick={() => handleDelete(row)}
-                        // />
                         <CustomConfirmIconButton
                           title={`Delete ${row.title}`}
                           question={"Are you sure to delete this Post permanently?"}

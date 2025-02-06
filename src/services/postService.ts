@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash";
+import { isEmpty, reject } from "lodash";
 import qs from "query-string";
 import dataServiceAxios from "./baseService";
 const { stringify } = qs;
@@ -28,8 +28,14 @@ const postService = {
   publish: function (id: number) {
     return dataServiceAxios.post(`core/posts/${id}/publish`);
   },
+  unPublish: function (id: number) {
+    return dataServiceAxios.post(`core/posts/${id}/unpublish`);
+  },
   approve: function (id: number) {
     return dataServiceAxios.post(`core/posts/${id}/approve`);
+  },
+  reject: function (id: number) {
+    return dataServiceAxios.post(`core/posts/${id}/reject`);
   },
   disapprove: function (id: number) {
     return dataServiceAxios.post(`core/posts/${id}/disapprove`);

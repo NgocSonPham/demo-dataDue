@@ -1,7 +1,8 @@
 import { DeleteIcon, EditIcon, PlusSquareIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, HStack, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, HStack, Icon, Stack, useDisclosure, useToast, VStack } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import React from "react";
+import { FaShareFromSquare } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
 import CustomCard from "../../../../components/CustomCard";
@@ -447,25 +448,28 @@ export default function RoadmapList() {
               onSelected={(value) => handleSelectCourse(parseInt(value[0]))}
               onRemove={(_value, _idx) => handleUnSelectCourse()}
             />
-            {!isEmpty(courseSelected) && (
-              <>
-                <EditIcon
-                  color="brand.600"
-                  w="15px"
-                  h="15px"
-                  cursor={"pointer"}
-                  onClick={() => handleUpdateCourse(courseSelected)}
-                />
-                <DeleteIcon
-                  color="red.500"
-                  w="15px"
-                  h="15px"
-                  cursor={"pointer"}
-                  onClick={() => handleDeleteCourse(courseSelected)}
-                />
-              </>
-            )}
-            <PlusSquareIcon color="brand.600" w="15px" h="15px" cursor={"pointer"} onClick={handleAddCourse} />
+            <Flex w="full" maxW="40px" gap={"8px"} align="center" flexWrap={"wrap"}>
+              {!isEmpty(courseSelected) && (
+                <>
+                  <EditIcon
+                    color="brand.600"
+                    w="15px"
+                    h="15px"
+                    cursor={"pointer"}
+                    onClick={() => handleUpdateCourse(courseSelected)}
+                  />
+                  <DeleteIcon
+                    color="red.500"
+                    w="15px"
+                    h="15px"
+                    cursor={"pointer"}
+                    onClick={() => handleDeleteCourse(courseSelected)}
+                  />
+                </>
+              )}
+              <PlusSquareIcon color="brand.600" w="15px" h="15px" cursor={"pointer"} onClick={handleAddCourse} />
+              <Icon as={FaShareFromSquare} color="brand.600" w="15px" h="15px" cursor={"pointer"} />
+            </Flex>
           </HStack>
           <VStack w="full" pl="25px" spacing={"12px"} align="flex-start">
             <Button w="full" border={"1px dashed"} onClick={handleAddLevel}>
@@ -547,6 +551,7 @@ export default function RoadmapList() {
               onSelected={(value) => handleSelectLesson(parseInt(value[0]))}
               onRemove={(_value, _idx) => handleUnSelectLesson()}
             />
+
             {!isEmpty(lessonSelected) && (
               <>
                 <EditIcon
@@ -570,6 +575,7 @@ export default function RoadmapList() {
                 navigate(`/admin/roadmaps/${roadmapSelected.id}/lessons/new`);
               }}
             />
+            <Icon as={FaShareFromSquare} color="brand.600" w="15px" h="15px" cursor={"pointer"} />
           </HStack>
           <Button
             w="full"
