@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Flex,
+  HStack,
   IconButton,
   Image,
   Input,
@@ -53,6 +54,7 @@ type RowObj = {
   comment: number;
   status: string;
   userId: number;
+  createdBy: any;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -233,53 +235,55 @@ export default function PostList() {
 
   return (
     <CustomCard flexDirection="column" w="100%" px="0px" overflowX={{ sm: "scroll", lg: "hidden" }}>
-      <Flex px="25px" mb="8px" justifyContent="flex-start" align="center" gap={"10px"}>
-        <InputGroup w={{ base: "100%", md: "200px" }}>
-          <InputLeftElement>
-            <IconButton
-              aria-label="search"
-              bg="inherit"
-              borderRadius="inherit"
-              _active={{
-                bg: "inherit",
-                transform: "none",
-                borderColor: "transparent"
-              }}
-              _focus={{
-                boxShadow: "none"
-              }}
-              icon={<SearchIcon color={"gray.700"} w="15px" h="15px" />}
-            />
-          </InputLeftElement>
+      <Flex px="25px" mb="18px" justifyContent="space-between" align="center" gap={"10px"}>
+        <HStack spacing="10px">
+          <InputGroup w={{ base: "100%", md: "200px" }}>
+            <InputLeftElement>
+              <IconButton
+                aria-label="search"
+                bg="inherit"
+                borderRadius="inherit"
+                _active={{
+                  bg: "inherit",
+                  transform: "none",
+                  borderColor: "transparent"
+                }}
+                _focus={{
+                  boxShadow: "none"
+                }}
+                icon={<SearchIcon color={"gray.700"} w="15px" h="15px" />}
+              />
+            </InputLeftElement>
 
-          <Input
-            variant="search"
-            pl="40px"
-            fontSize="sm"
-            bg={"secondaryGray.300"}
-            color={"gray.700"}
-            fontWeight="500"
-            _placeholder={{ color: "gray.400", fontSize: "14px" }}
-            borderRadius={"30px"}
-            placeholder={"Tìm kiếm..."}
-            onChange={(e: any) => handleSearch(e.target.value)}
-          />
-        </InputGroup>
-        {Object.entries(POST_STATUS).map(([key, value]) => (
-          <Button
-            key={key}
-            variant={statusSelected.includes(value) ? "brand" : "action"}
-            onClick={() => handleFilterStatus(value)}
-          >
-            {value}
-          </Button>
-        ))}
+            <Input
+              variant="search"
+              pl="40px"
+              fontSize="sm"
+              bg={"secondaryGray.300"}
+              color={"gray.700"}
+              fontWeight="500"
+              _placeholder={{ color: "gray.400", fontSize: "14px" }}
+              borderRadius={"30px"}
+              placeholder={"Tìm kiếm..."}
+              onChange={(e: any) => handleSearch(e.target.value)}
+            />
+          </InputGroup>
+          {Object.entries(POST_STATUS).map(([key, value]) => (
+            <Button
+              key={key}
+              variant={statusSelected.includes(value) ? "brand" : "action"}
+              onClick={() => handleFilterStatus(value)}
+            >
+              {value}
+            </Button>
+          ))}
+        </HStack>
         <Button variant="action" onClick={() => navigate("/admin/posts/new")}>
           <Icon as={FaPlus} w="15px" h="15px" />
         </Button>
       </Flex>
 
-      <Table variant="simple" color="gray.500" w="full" layout="fixed">
+      <Table variant="simple" color="gray.500" w="full" layout="fixed" sx={{ th: { p: "6px" }, td: { p: "6px" } }}>
         <Thead>
           <Tr>
             <Th
@@ -299,8 +303,6 @@ export default function PostList() {
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
-              // w="20%"
-              maxW="100px"
               px="10px"
             >
               Tên
@@ -312,30 +314,35 @@ export default function PostList() {
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
               w="120px"
+              maxW="120px"
+              minW="100px"
               px="10px"
             >
-              Thumbnail
+              Main Cat
             </Th>
-            {/* <Th
-              textAlign="center"
-              borderColor={borderColor}
-              color="gray.400"
-              cursor="pointer"
-              fontSize={{ sm: "10px", lg: "12px" }}
-              // w="20%"
-              maxW="100px"
-              px="10px"
-            >
-              Trích dẫn
-            </Th> */}
             <Th
               textAlign="center"
               borderColor={borderColor}
               color="gray.400"
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
+              w="120px"
+              maxW="120px"
+              minW="100px"
               px="10px"
-              w="220px"
+            >
+              Sub Cat
+            </Th>
+            <Th
+              textAlign="center"
+              borderColor={borderColor}
+              color="gray.400"
+              cursor="pointer"
+              fontSize={{ sm: "10px", lg: "12px" }}
+              w="160px"
+              maxW="160px"
+              minW="100px"
+              px="10px"
             >
               Topics
             </Th>
@@ -357,9 +364,10 @@ export default function PostList() {
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
               px="10px"
-              w="160px"
+              w="140px"
+              minW="140px"
             >
-              Ngày tạo
+              Người tạo
             </Th>
             <Th
               textAlign="center"
@@ -368,11 +376,11 @@ export default function PostList() {
               cursor="pointer"
               fontSize={{ sm: "10px", lg: "12px" }}
               px="10px"
-              w="160px"
+              w="100px"
             >
-              Cập nhật gần nhất
+              Ngày tạo
             </Th>
-            <Th borderColor={borderColor} cursor="pointer" w="100px" minW={0} px="10px" />
+            <Th borderColor={borderColor} cursor="pointer" w="100px" maxW="100px" minW="0px" px="10px" />
           </Tr>
         </Thead>
         <Tbody>
@@ -386,14 +394,9 @@ export default function PostList() {
                     </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
-                    <Text color={textColor} fontSize="sm" noOfLines={1}>
+                    <Text color={textColor} fontSize="sm" noOfLines={3}>
                       {row.title}
                     </Text>
-                  </Td>
-                  <Td borderColor={borderColor}>
-                    <Center w="full">
-                      <Image src={row.thumbnail} alt="post-image" w={"100px"} h={"100px"} objectFit={"contain"} />
-                    </Center>
                   </Td>
                   {/* <Td borderColor={borderColor} px="10px">
                     <Text color={textColor} fontSize="sm" noOfLines={2}>
@@ -401,13 +404,26 @@ export default function PostList() {
                     </Text>
                   </Td> */}
                   <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
-                    <Flex w="full" align="center" justify="center" flexWrap={"wrap"} gap="6px">
+                    <Text color={textColor} fontSize="sm" w="full" noOfLines={2} textAlign={"center"}>
+                      {row.mainCategory.name}
+                    </Text>
+                  </Td>
+                  <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
+                    <Text color={textColor} fontSize="sm" w="full" noOfLines={2} textAlign={"center"}>
+                      {row.subCategory.name}
+                    </Text>
+                  </Td>
+                  <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
+                    <Text color={textColor} fontSize="sm" w="full" noOfLines={2} textAlign={"center"}>
+                      {row.topics?.join(", ")}
+                    </Text>
+                    {/* <Flex w="full" align="center" justify="center" flexWrap={"wrap"} gap="6px">
                       {row.topics?.map((topic, index) => (
                         <Tag key={index} variant={"lightBrand"} fontSize="16px" px="10px" py="6px" rounded="full">
                           <TagLabel>{topic}</TagLabel>
                         </Tag>
                       ))}
-                    </Flex>
+                    </Flex> */}
                   </Td>
                   <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
                     <Flex w="full" align="center" justify="center" flexWrap={"wrap"} gap="6px">
@@ -431,14 +447,14 @@ export default function PostList() {
                       </Tag>
                     </Flex>
                   </Td>
+                  <Td fontSize={{ sm: "14px" }} borderColor={borderColor}>
+                    <Text color={textColor} fontSize="sm" w="full" noOfLines={2} textAlign={"center"}>
+                      {row.createdBy.username}
+                    </Text>
+                  </Td>
                   <Td borderColor={borderColor} px="10px">
                     <Text color={textColor} fontSize="sm" w="full" textAlign="center">
                       {dayjs(row.createdAt).format("DD/MM/YYYY HH:mm")}
-                    </Text>
-                  </Td>
-                  <Td borderColor={borderColor} px="14px">
-                    <Text color={textColor} fontSize="sm" w="full" textAlign="center">
-                      {dayjs(row.updatedAt).format("DD/MM/YYYY HH:mm")}
                     </Text>
                   </Td>
                   <Td borderColor={borderColor} px="10px">
@@ -525,8 +541,8 @@ export default function PostList() {
         </Tbody>
         <Tfoot>
           <Tr>
-            <Td colSpan={8} pb={0} border={0}>
-              <Flex w="full" align={"center"} justify={"space-between"}>
+            <Td colSpan={9} border={0}>
+              <Flex w="full" align={"center"} justify={"space-between"} p="10px" pb={0}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0
                     ? `Showing ${(page - 1) * PAGE_ITEMS + 1} to ${
