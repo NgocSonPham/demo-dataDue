@@ -99,7 +99,6 @@ export default function Navbar(props: {
                 Pages
               </BreadcrumbLink>
             </BreadcrumbItem>
-
             <BreadcrumbItem color={secondaryText} fontSize="sm">
               <BreadcrumbLink href="#" color={secondaryText}>
                 {brandText}

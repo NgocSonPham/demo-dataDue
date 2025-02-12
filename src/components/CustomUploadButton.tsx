@@ -15,7 +15,7 @@ import {
   useDisclosure,
   useToast
 } from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import React, { HTMLAttributes, useMemo } from "react";
 import { RiCloseCircleFill } from "react-icons/ri";
 import uploadService from "../services/uploadService";
 import AppToast from "./AppToast";
@@ -27,8 +27,12 @@ interface UploadButtonProps extends FlexProps {
   src?: string;
   thumbnail?: boolean;
   loading?: boolean;
+  triggerButton?: {
+    component: React.ReactNode;
+  } & HTMLAttributes<HTMLDivElement>;
   onUploadChange: (name: string, file: string | string[]) => void;
 }
+
 
 export default function CustomUploadButton({
   align,
@@ -43,8 +47,10 @@ export default function CustomUploadButton({
   name,
   src,
   thumbnail,
+  triggerButton,
   onUploadChange,
   ...others
+
 }: UploadButtonProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [loading, setLoading] = React.useState(false);
@@ -119,9 +125,11 @@ export default function CustomUploadButton({
     }
   };
 
-  const handleImageClick = () => {
+  const handleImageClick = (e: any) => {
+    e.stopPropagation();
     fileInputRef.current?.click();
   };
+
 
   const handleViewImage = (e: any) => {
     e.stopPropagation();
@@ -162,7 +170,7 @@ export default function CustomUploadButton({
       {children ? (
         children
       ) : src ? (
-        <Flex bg={"secondaryGray.100"} w={"120px"} h={"100px"} position="relative" px="10px" py="20px" rounded={"8px"}>
+        <Flex bg={"secondaryGray.100"} w={"100%"} h={"100%"} position="relative" rounded={"8px"}>
           <Center w={"full"} h={"full"} overflow="hidden" position="relative" rounded={"4px"} onClick={handleViewImage}>
             <Image src={src} />
           </Center>
@@ -180,10 +188,11 @@ export default function CustomUploadButton({
           />
         </Flex>
       ) : (
-        <Box position="relative" w="48px" h="48px">
-          <Image src="/icons/image-add.png" alt="upload" width={"full"} height={"full"} />
+        <Box position="relative" w="100%" h="100%" >
+          <Image src="/icons/image-add.png" objectFit="contain" alt="upload" width={"full"} height={"full"} />
           {/* <Box position="absolute" bottom="-1" right="-3" w="20px" h="20px">
             <Image
+
               src="/icons/circle-plus.png"
               alt="plus"
               width={"20px"}
@@ -193,10 +202,16 @@ export default function CustomUploadButton({
         </Box>
       )}
       {label && !src && (
-        <Text color="secondaryGray.600" textAlign="center" whiteSpace="pre-line">
+        <Text color="secondaryGray.600" textAlign="right" whiteSpace="pre-line">
           {label}
         </Text>
       )}
+      {triggerButton && <div className={triggerButton.className} onClick={handleImageClick}>
+        {
+          triggerButton.component
+        }
+      </div>}
+
       {loading && (
         <Box
           position="absolute"

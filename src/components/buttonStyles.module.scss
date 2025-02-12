@@ -1,0 +1,50 @@
+.button {
+  display: flex;
+  padding: 8.295px 13.272px;
+  justify-content: center;
+  align-items: center;
+  gap: 6.636px;
+  border-radius: 16px;
+  cursor: pointer;
+  height: 33.181px;
+
+  .span {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &::disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+
+  &.primary {
+    background: #4F46E5;
+    color: #FFF;
+    padding: 8.295px 13.272px;
+  }
+
+  &.secondary {
+    background: #FFF;
+    color: #475569;
+    border: 0.83px solid #CBD5E1;
+  }
+
+  &.success {
+    background: #10B981;
+    color: #FFF;
+  }
+
+  &.danger {
+    color: #C33327;
+    border: 1.5px solid #C33327;
+  }
+}

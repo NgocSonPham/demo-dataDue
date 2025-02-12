@@ -1,7 +1,7 @@
 import { Box, Flex, useBreakpointValue, useDisclosure } from "@chakra-ui/react";
 import { isEmpty } from "lodash";
 import React from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 import { selectUser } from "../../../redux/slice";
 import { isHasPermission } from "../../../utils/helpers";
@@ -10,6 +10,7 @@ import Navbar from "./navbar";
 import Sidebar from "./sidebar";
 import Dashboard from "../pages/dashboard/Dashboard";
 import BooleanContext from "./context/ExpandContext";
+import PostHeader from "../pages/post/StickyHeader";
 
 // Custom Chakra theme
 export default function AdminLayout(props: any) {
@@ -21,6 +22,11 @@ export default function AdminLayout(props: any) {
   const [fixed] = React.useState(false);
   const [activeRoute, setActiveRoute] = React.useState("Dashboard");
   let location = useLocation();
+  console.log('location>>', location);
+  const params = useParams();
+  console.log('params>>', params);
+
+  const isPostPage = location.pathname.includes('/admin/posts/');
 
   React.useEffect(() => {
     getActiveRoute(routesState);
@@ -109,14 +115,15 @@ export default function AdminLayout(props: any) {
           transitionTimingFunction="linear, linear, ease"
           pt={{ base: "130px", md: "80px", xl: "80px" }}
         >
-          <Navbar
-            onOpen={onOpen}
-            brandText={activeRoute}
-            message={getActiveNavbarText(routesState)}
-            fixed={fixed}
-            {...rest}
-          />
-
+          {
+            isPostPage ? <PostHeader /> : <Navbar
+              onOpen={onOpen}
+              brandText={activeRoute}
+              message={getActiveNavbarText(routesState)}
+              fixed={fixed}
+              {...rest}
+            />
+          }
           {getRoute() ? (
             <Box mx="auto" p={{ base: "20px", md: "30px" }} pe="20px">
               <Routes>

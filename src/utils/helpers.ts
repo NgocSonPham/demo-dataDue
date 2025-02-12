@@ -27,9 +27,8 @@ export const userFullnameOrUsername = (
 
   return isFullName
     ? `${upperFirst(firstname) ?? ""} ${upperFirst(lastname) ?? ""}`
-    : `${upperFirst(firstname) ?? ""}${
-        lastname ? ` ${upperFirst(lastname[0])}.` : ""
-      }`;
+    : `${upperFirst(firstname) ?? ""}${lastname ? ` ${upperFirst(lastname[0])}.` : ""
+    }`;
 };
 
 export const userFullname = (user: any, isFullName: boolean = false) => {
@@ -39,9 +38,8 @@ export const userFullname = (user: any, isFullName: boolean = false) => {
 
   return isFullName
     ? `${upperFirst(firstname) ?? ""} ${upperFirst(lastname) ?? ""}`
-    : `${upperFirst(firstname) ?? ""}${
-        lastname ? ` ${upperFirst(lastname[0])}.` : ""
-      }`;
+    : `${upperFirst(firstname) ?? ""}${lastname ? ` ${upperFirst(lastname[0])}.` : ""
+    }`;
 };
 
 export const getErrorMessage = (error: any) => {
@@ -176,3 +174,12 @@ export const splitTheArray = (originArray: any[], numberOfNewArray: number) => {
 export const checkDifference = (a: number, b: number) => {
   return Math.abs(a - b) < 0.5;
 };
+
+export function debounce(func: any, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return function (...args: any[]) {
+    clearTimeout(timeout);
+    // @ts-ignore
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
