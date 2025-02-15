@@ -7,17 +7,41 @@ const postService = {
   getAll: function (queryParams: { [key: string]: any }) {
     return dataServiceAxios.get(isEmpty(queryParams) ? `core/posts` : `core/posts?${stringify(queryParams)}`);
   },
-  getById: function (id: number | string) {
-    return dataServiceAxios.get(`core/posts/${id}`);
+  getById: async function (id: number | string) {
+    return dataServiceAxios.get(`core/posts/${id}`)
   },
   dashboard: function (id: number | string) {
     return dataServiceAxios.get(`core/posts/${id}/dashboard`);
   },
-  create: function (data: any) {
-    return dataServiceAxios.post(`core/posts`, data);
+  create: async function (data: any) {
+    try {
+      const response = await dataServiceAxios.post(`core/posts`, data);
+      return {
+        status: response.status,
+        data: response.data?.data,
+      }
+    } catch (error: any) {
+      console.log('error>>', error);
+      return {
+        status: error.response.status || error.status,
+        errors: error.response.data.errors || error.data.errors,
+      }
+    }
   },
-  update: function (id: number | string, data: any) {
-    return dataServiceAxios.patch(`core/posts/${id}`, data);
+  update: async function (id: number | string, data: any) {
+    try {
+      const response = await dataServiceAxios.patch(`core/posts/${id}`, data);
+      return {
+        status: response.status,
+        data: response.data?.data,
+      }
+    } catch (error: any) {
+      console.log('update error>>', error);
+      return {
+        status: error.response.status || error.status,
+        errors: error.response.data.errors || error.data.errors,
+      }
+    }
   },
   delete: function (id: number) {
     return dataServiceAxios.delete(`core/posts/${id}`);

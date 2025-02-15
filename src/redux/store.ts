@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import appReducer from "./slice";
 import { getFromDB, saveToDB, deleteFromDB } from "../storages/indexedDB";
-
+import postDetailReducer from "@/modules/admin/pages/post/postDetailSlice";
 const reduxPersistIndexedDB = {
   async getItem(key: string): Promise<string | null> {
     const value = await getFromDB(key);
@@ -26,7 +26,8 @@ const persistedAppReducer = persistReducer(appPersistConfig, appReducer);
 
 export const store = configureStore({
   reducer: {
-    app: persistedAppReducer
+    app: persistedAppReducer,
+    postDetail: postDetailReducer
   }
 });
 

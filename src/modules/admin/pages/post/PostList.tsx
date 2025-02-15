@@ -385,7 +385,7 @@ export default function PostList() {
           {list &&
             list.map((row) => {
               return (
-                <Tr key={row.id}>
+                <Tr key={row.id} onClick={() => handleEdit(row.id)}>
                   <Td borderColor={borderColor}>
                     <Text w="full" color={textColor} fontSize="sm" fontWeight="700" textAlign={"center"}>
                       {row.id}
@@ -543,9 +543,8 @@ export default function PostList() {
               <Flex w="full" align={"center"} justify={"space-between"} p="10px" pb={0}>
                 <Text fontSize="sm" color="gray.500">
                   {totalItems > 0
-                    ? `Showing ${(page - 1) * PAGE_ITEMS + 1} to ${
-                        (page - 1) * PAGE_ITEMS + (list?.length ?? 1)
-                      } of ${totalItems} entries`
+                    ? `Showing ${(page - 1) * PAGE_ITEMS + 1} to ${(page - 1) * PAGE_ITEMS + (list?.length ?? 1)
+                    } of ${totalItems} entries`
                     : ""}
                 </Text>
                 <Pagination page={page} totalItems={totalItems} itemsPerPage={itemsPerPage} onPageChange={setPage} />

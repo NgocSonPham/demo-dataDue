@@ -10,8 +10,8 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { isEmpty } from "lodash";
-import React, { useContext, useEffect } from "react";
+import { isEmpty, isEqual } from "lodash";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import AppToast from "../../../../components/AppToast";
@@ -46,46 +46,49 @@ import MultipleShapes from "@/assets/icons/MultipleShapes";
 import SingleSelect from "@/components/ui/select";
 import { useClipboard } from "@/hooks/use-clipboard";
 import StickyHeader from "./StickyHeader";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import getPostDetail from "./services";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import formatDateTime from "@/utils/dateTime";
+import { DropdownMenuSelectAble } from "@/components/DropdownMenuSelectable";
+import { resetPostDetail, setPostDetail, VERSION_OPTIONS } from "./postDetailSlice";
+import { PostInterface } from "./interfaces";
+import { POST_STATUS } from "./constant";
+import CustomConfirmAlert from "@/components/CustomConfirmAlert";
 
+const CONFIRM_TYPES = {
+  PUBLISH: 'PUBLISH',
+  DELETE: 'DELETE',
+}
 
-type FormType = {
-  id?: string;
-  thumbnail: string;
-  title: string;
-  shortDescription: string;
-  mainCategoryId: number;
-  subCategoryId: number;
-  topics?: string[];
-  content: string;
-};
 
 export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
   const clipboard = useClipboard({ timeout: 2000 });
+  const dispatch = useAppDispatch();
 
   const { isExpand, setIsExpand } = useContext(BooleanContext);
-  console.log('isExpand>>', isExpand);
 
   const [loading, setLoading] = React.useState(true);
   const [mainCategoryList, setMainCategoryList] = React.useState<any[]>([]);
   const [subCategoryList, setSubCategoryList] = React.useState<any[]>([]);
   const [topicList, setTopicList] = React.useState<any[]>([]);
-  console.log('mainCategoryList>>', mainCategoryList);
+  const [confirmType, setConfirmType] = React.useState<string | null>(null);
 
-  const [defaultValues, setDefaultValues] = React.useState({
-    thumbnail: "",
-    title: "",
-    shortDescription: "",
-    content: ""
-  });
-  console.log('id>>', id);
+  const postDetail = useAppSelector((state) => state.postDetail);
 
-  const { control, reset, setValue, watch, handleSubmit: onSubmit } = useForm<FormType>({ defaultValues });
-  console.log('control>>', control);
+  const { control, reset, setValue, watch, handleSubmit: onSubmit, formState: { isDirty, errors } } = useForm<PostInterface>({ defaultValues: postDetail });
+
+  const isEdited = useMemo(() => {
+    const compareFields = ['content', 'title', 'mainCategoryId', 'subCategoryId', 'topics', 'thumbnail', 'shortDescription'];
+    return compareFields.some((field) => !isEqual(postDetail[field as keyof PostInterface], watch(field as any)));
+  }, [postDetail, watch()]);
 
   const init = async () => {
+    console.log('init');
+
     try {
       const {
         data: { data: mainCatList }
@@ -102,12 +105,21 @@ export default function PostDetail() {
         return;
       }
 
-      const {
-        data: { data: post }
-      } = await postService.getById(id);
-
-      setDefaultValues(post);
-      reset(post, { keepDefaultValues: true });
+      try {
+        await dispatch(getPostDetail(id)).unwrap().catch((error) => {
+          console.log("error>>", error);
+          toast({
+            title: 'Không tìm thấy bài viết',
+            description: error?.message || 'Bài viết không tồn tại hoặc đã bị xóa',
+            status: 'error',
+            duration: 5000,
+            position: 'top-right',
+          });
+          navigate('/admin/posts');
+        })
+      } catch (error) {
+        console.log("error>>", error);
+      }
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -137,7 +149,6 @@ export default function PostDetail() {
       const {
         data: { data: list }
       } = await subCategoryService.getAllTopics(subCategoryId);
-      console.log('list>>', list);
 
       setTopicList(
         list.count === 0
@@ -152,8 +163,15 @@ export default function PostDetail() {
     }
   };
 
+
   React.useEffect(() => {
     init();
+    if (isExpand) {
+      setIsExpand(false);
+    }
+    return () => {
+      dispatch(resetPostDetail());
+    }
   }, []);
 
   const { mainCategoryId, subCategoryId } = watch();
@@ -169,36 +187,70 @@ export default function PostDetail() {
     initSubCategoryTopics(subCategoryId);
   }, [subCategoryId]);
 
-  const { mutate, isLoading } = useMutation({
-    mutationFn: (data: any) => {
-      return id === "new" ? postService.create(data) : postService.update(id, data);
-    },
-    onSuccess: () => {
-      toast({
-        description: "Lưu thành công!",
-        status: "success",
-        duration: 9000,
-        position: "top-right",
-        isClosable: true
-      });
-
-      reset(defaultValues, { keepDefaultValues: true });
-      navigate("/admin/posts");
-    },
-    onError: (error) => {
-      const message = getErrorMessage(error);
-
-      toast({
-        position: "top-right",
-        render: ({ onClose }) => <AppToast status={"error"} subtitle={message} onClose={onClose} />
-      });
+  const handleSubmit: SubmitHandler<PostInterface> = async (data) => {
+    if (id === 'new' || !postDetail.id) {
+      const response: any = await postService.create(data)
+      if (response.errors?.length > 0) {
+        const error = response.errors[0].message || 'Có lỗi xảy ra, vui lòng thử lại!';
+        toast({
+          title: 'Có lỗi xảy ra',
+          description: error,
+          status: "error",
+          duration: 5000,
+          position: "top-right",
+          isClosable: true
+        })
+      } else {
+        dispatch(setPostDetail(response.data));
+        toast({
+          title: 'Tạo bài viết thành công',
+          description: 'Bài viết đã được tạo thành công',
+          status: 'success',
+          duration: 5000,
+          position: 'top-right',
+        })
+        navigate(`/admin/posts/${response.data.id}`);
+      }
+    } else {
+      const updateResponse: any = await postService.update(id, data);
+      if (updateResponse.errors?.length > 0) {
+        const error = updateResponse.errors[0].message || 'Có lỗi xảy ra, vui lòng thử lại!';
+        toast({
+          title: 'Có lỗi xảy ra',
+          description: error,
+        })
+      } else {
+        dispatch(setPostDetail(updateResponse.data));
+        toast({
+          title: 'Cập nhật thành công',
+          description: 'Bài viết đã được cập nhật thành công',
+          status: 'success',
+          duration: 5000,
+          position: 'top-right',
+        })
+        console.log('updateResponse.data>>', updateResponse.data);
+      }
     }
-  });
-
-  const handleSubmit: SubmitHandler<FormType> = async (data) => {
-    console.log('data>>', data);
-    mutate(data);
+    // mutate(data);
   };
+
+  const handleDelete = async () => {
+    if (!postDetail.id) return;
+    const response: any = await postService.delete(postDetail.id as any);
+    if (response.errors?.length > 0) {
+      const error = response.errors[0].message || 'Có lỗi xảy ra, vui lòng thử lại!';
+      toast({
+        title: 'Có lỗi xảy ra',
+        description: error,
+      })
+    } else {
+      toast({
+        title: 'Xóa bài viết thành công',
+        description: 'Bài viết đã được xóa thành công',
+      })
+      navigate('/admin/posts');
+    }
+  }
 
   const handleUpload = async (name: string, file: string | string[]) => {
     if (name === "thumbnail") {
@@ -207,23 +259,31 @@ export default function PostDetail() {
     }
   };
 
+  const handleCopyLink = () => {
+    if (!postDetail.link) return;
+    clipboard.copy(postDetail.link);
+    toast({
+      title: "Đã copy link",
+      status: "success",
+      position: "top-right",
+      duration: 5000,
+      isClosable: true
+    });
+  }
+
   const CardDetailFooter = () => <>
-    <Button variant={ButtonVariants.DANGER} icon={<TrashIcon />} style={{ width: '33.181px', padding: 0 }} />
+    <Button variant={ButtonVariants.DANGER} icon={<TrashIcon />} onClick={() => setConfirmType(CONFIRM_TYPES.DELETE)} style={{ width: '33.181px', padding: 0 }} />
     <div className={styles.actions}>
-      <Button variant={ButtonVariants.SECONDARY} label="Lưu Nháp" onClick={onSubmit(handleSubmit)} />
-      <Button variant={ButtonVariants.PRIMARY} label="Xuất Bản" />
+      <Button variant={ButtonVariants.SECONDARY} label="Lưu Nháp" disabled={!isEdited} onClick={onSubmit((data) => handleSubmit({ ...data, status: POST_STATUS.DRAFT }))} />
+      <Button variant={ButtonVariants.PRIMARY} label="Xuất Bản" disabled={postDetail.status !== POST_STATUS.DRAFT} onClick={() => setConfirmType(CONFIRM_TYPES.PUBLISH)} />
     </div>
   </>
 
   useEffect(() => {
-    if (isExpand) {
-      setIsExpand(false);
-    }
-  }, [])
-
+    reset({ ...postDetail }, { keepDefaultValues: true });
+  }, [postDetail]);
 
   if (loading) {
-    init();
     return (
       <CustomCard flexDirection="column" w="100%" px="0px" overflowX={{ sm: "scroll", lg: "hidden" }}>
         <Center w="full" h="560px">
@@ -242,7 +302,7 @@ export default function PostDetail() {
             name="content"
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <FormControl isInvalid={!!error} id="tags">
-                <CustomEditorWrapper type={"html"} content={value} onChange={onChange as any} />
+                <CustomEditorWrapper type={"html"} content={value} onChange={onChange as any} saved={!isEdited} />
                 {error && <FormErrorMessage>{error.message}</FormErrorMessage>}
               </FormControl>
             )}
@@ -258,7 +318,7 @@ export default function PostDetail() {
                     <div className={styles.itemInfo}>
                       Trạng thái:
                       <div className={styles.value}>
-                        Draft
+                        {postDetail.status}
                       </div>
                     </div>
                   </div>
@@ -275,9 +335,18 @@ export default function PostDetail() {
                       </div>
                     </div>
                   </div>
-                  <button className={styles.actionButton}>
-                    Edit
-                  </button>
+                  <DropdownMenuSelectAble
+                    options={VERSION_OPTIONS}
+                    value={watch("version")}
+                    onChange={(value) =>
+                      setValue("version", value)
+                    }
+                    optionTitle="Chọn phiên bản"
+                    triggerComponent={
+                      <button className={styles.actionButton}>
+                        Edit
+                      </button>}
+                  />
                 </div>
                 <div className={styles.bodyItemWrapper}>
                   <div className={styles.bodyItem}>
@@ -300,13 +369,15 @@ export default function PostDetail() {
                     <div className={styles.itemInfo}>
                       Link:
                       <div className={styles.link}>
-                        Link: https://datadude.vn/--/--/ ..
+                        Link: {postDetail.link || '--'}
                       </div>
                     </div>
                   </div>
-                  <button className={styles.actionButton} onClick={() => clipboard.copy('Link: https://datadude.vn/--/--/ ..')}>
-                    Copy
-                  </button>
+                  {
+                    postDetail.link && <button className={styles.actionButton} onClick={handleCopyLink}>
+                      Copy
+                    </button>
+                  }
                 </div>
                 <div className={styles.bodyItemWrapper}>
                   <div className={styles.bodyItem}>
@@ -316,7 +387,9 @@ export default function PostDetail() {
                     <div className={styles.itemInfo}>
                       Ngày xuất bản:
                       <div className={styles.value}>
-                        --
+                        {postDetail.publishedAt ?
+                          `${formatDateTime(postDetail.publishedAt)?.[0]} - ${formatDateTime(postDetail.publishedAt)?.[1]}`
+                          : "--"}
                       </div>
                     </div>
                   </div>
@@ -328,9 +401,9 @@ export default function PostDetail() {
                     </div>
                     <div className={styles.itemInfo}>
                       Ngày cập nhật:
-                      <div className={styles.value}>
-                        19/07/2024 - 10:10 pm
-                      </div>
+                      {postDetail.updatedAt ?
+                        ` ${formatDateTime(postDetail.updatedAt, true)?.[0]} - ${formatDateTime(postDetail.updatedAt, true)?.[1]}`
+                        : "--"}
                     </div>
                   </div>
                 </div>
@@ -360,8 +433,9 @@ export default function PostDetail() {
                   <Controller
                     name="shortDescription"
                     control={control}
+                    rules={{ required: "Tóm tắt nội dung không được để trống" }}
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
-                      <TextArea wordCount limit={100} value={value} onChange={onChange} error={error} />
+                      <TextArea wordCount={true} limit={256} value={value} onChange={onChange} error={error} />
                     )}
                   />
                 </div>
@@ -430,6 +504,29 @@ export default function PostDetail() {
           </div>
         </div>
       </div>
+      {
+        confirmType === CONFIRM_TYPES.DELETE &&
+        <CustomConfirmAlert
+          title="Xóa bài viết"
+          question="Bạn có chắc chắn muốn xóa bài viết này không?"
+          cancelText="Hủy"
+          confirmText="Xóa"
+          onClose={() => setConfirmType(null)}
+          onConfirm={() => handleDelete()}
+        />
+      }
+      {
+        confirmType === CONFIRM_TYPES.PUBLISH &&
+        <CustomConfirmAlert
+          title="Xuất bản bài viết"
+          question="Bạn có chắc chắn muốn xuất bản bài viết này không?"
+          cancelText="Hủy"
+          confirmText="Xuất bản"
+          onClose={() => setConfirmType(null)}
+          onConfirm={onSubmit((data) => handleSubmit({ ...data, status: POST_STATUS.PUBLISHED }))}
+        />
+      }
+
     </>
   );
 }

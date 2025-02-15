@@ -159,10 +159,11 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   placeholderIcon?: React.ReactElement<any, string | React.JSXElementConstructor<any>>
   labelClassName?: string
   error?: any
+  triggerComponent?: React.ReactElement<any, string | React.JSXElementConstructor<any>>
 }
 
 const SingleSelect = (props: Props) => {
-  const { options, error, label, dropDownIcon, placeholderIcon, labelClassName, className, placeholder = 'Chưa chọn', value, onChange = () => { }, ...rest } = props
+  const { options, error, label, triggerComponent, dropDownIcon, placeholderIcon, labelClassName, className, placeholder = 'Chưa chọn', value, onChange = () => { }, ...rest } = props
 
   return (
     <div className={clsx('flex flex-col gap-2 items-stretch w-full', className)} {...rest}>
@@ -174,9 +175,10 @@ const SingleSelect = (props: Props) => {
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className={clsx(error && 'border-red-500')}>
           {placeholderIcon && placeholderIcon}
-          <div className='w-full flex flex-start items-center'>
-            {value ? options.find(option => String(option.value) === value)?.label : placeholder}
-          </div>
+          {triggerComponent ? triggerComponent :
+            <div className='w-full flex flex-start items-center'>
+              {value ? options.find(option => String(option.value) === value)?.label : placeholder}
+            </div>}
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>

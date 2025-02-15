@@ -1,40 +1,33 @@
-import { Textarea, TextareaProps } from '@chakra-ui/react'
-import React from 'react'
+
+import React, { useEffect } from 'react'
 import styles from './styles.module.scss'
 import clsx from 'clsx'
+import { Textarea } from './ui/textarea';
+import { cn } from '@/lib/utils';
 type Props = {
   placeholder?: string;
   value?: string;
   limit?: number;
   wordCount?: boolean;
   error?: any;
-  onChange?: (value: string) => void;
-} & TextareaProps
+  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
+  className?: string;
+}
 
 
 const TextArea = (props: Props) => {
   const { placeholder = '', value = '', error, limit, wordCount, className, onChange = () => { }, ...rest } = props;
-  console.log('TextArea>>', error);
+
   return (
-    <div className={clsx(styles.textAreaWrapper, className)}>
+    <div className={clsx(styles.textAreaWrapper, className, error && '!border-red-500')}>
       <Textarea
-        bg="backgroundTextfield"
-        w="full"
-        fontSize="sm"
-        fontWeight="400"
-        letterSpacing={"-0.2px"}
-        lineHeight="24px"
-        rounded={"0px"}
-        rows={5}
-        variant={"unstyled"}
-        p={0}
-        className={styles.textarea}
-        placeholder={placeholder}
+        maxLength={limit}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        {...rest}
+        onChange={onChange}
+        className={cn('font-normal resize-none shadow-none text-[12px] leading-[14.52px] tracking-[0%] border-none outline-none', className)}
       />
       {wordCount && <div className={styles.footer}>{value?.length} {limit && ` / ${limit}`}</div>}
+      {error && <div className='text-red-500 text-sm w-full text-left'>{error.message}</div>}
     </div>
   )
 }

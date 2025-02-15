@@ -196,14 +196,9 @@ const CustomEditorWrapper = (props: Props) => {
         <div className={styles.editorStatus}>
           <div className={styles.statusItem}>
             <MarkSaved isSaved={saved} />
-            Đã lưu
-          </div>
-          <div className={styles.statusItem}>
-            <MarkSaved isSaved={!saved} />
-            Chưa lưu
+            {saved ? "Đã lưu" : "Chưa lưu"}
           </div>
         </div>
-
         <div className={styles.wordCount}>
           {/* <div className={styles.wordCountItem}>
             {editorRef.current?.editor?.storage?.characterCount?.characters() || 0}/{limit}  Ký tự
